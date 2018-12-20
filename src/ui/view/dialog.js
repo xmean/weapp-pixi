@@ -48,7 +48,7 @@ export default class Dialog extends View {
 
     this.addChild(this.backdropView);
 
-    this.backdropView.tap = (event) => {
+    this.backdropView.tap = () => {
       if(!this.modal) {
         this.close();
       }

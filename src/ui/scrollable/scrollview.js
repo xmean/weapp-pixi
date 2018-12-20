@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import Tween from "../tween/tween";
+import Tween from "../../tween/tween";
 
 import View from "../view/view";
 
@@ -148,7 +148,7 @@ export default class ScrollView extends View {
     }
   }
 
-  onDragEnd(event) {
+  onDragEnd() {
     if (!this.horizontalScrollEnabled && !this.verticalScrollEnabled) {
       return;
     }

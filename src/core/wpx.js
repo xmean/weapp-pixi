@@ -3,7 +3,7 @@ import * as PIXI from "pixi.js";
 
 export default class WPX {
   constructor(options) {
-  	this.width = SYSTEM.windowWidth;
+    this.width = SYSTEM.windowWidth;
     this.height = SYSTEM.windowHeight;
     this.view = SYSTEM.canvas;
     this.resolution = SYSTEM.resolution;

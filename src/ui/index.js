@@ -10,7 +10,6 @@ import ListView from "./scrollable/listview";
 import ScrollView from "./scrollable/scrollview";
 
 import Page from "./page/page";
-import PageManager from "./page/pagemanager";
 
 import Layout from "./layout/layout";
 import LinearLayout from "./layout/linearlayout";
@@ -33,7 +32,6 @@ UI.TextView = TextView;
 UI.ListView = ListView;
 UI.ScrollView = ScrollView;
 
-UI.PageManager = PageManager;
 UI.Page = Page;
 
 UI.Layout = Layout;

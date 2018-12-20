@@ -1,12 +1,12 @@
-import WPX from "./core/wpx.js";
-import SYSTEM from "/core/system.js";
+import WPX from "./core/wpx";
+import SYSTEM from "./core/system";
 
-import Tween from "./tween/tween.js";
-import ResLoader from "./loader/loader.js";
-import UI from "./ui/index.js";
+import Tween from "./tween/tween";
+import ResLoader from "./loader/loader";
+import UI from "./ui/index";
 
-import DrawUtils from "./utils/drawutils.js";
-import MathUtils from "./utils/mathutils.js";
+import DrawUtils from "./utils/drawutils";
+import MathUtils from "./utils/mathutils";
 
 // namespace
 

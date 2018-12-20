@@ -1,7 +1,6 @@
 import * as PIXI from "pixi.js";
 
 import View from "./view";
-import ViewError from "./viewerror";
 
 export default class TextView extends View {
   constructor(style, text) {

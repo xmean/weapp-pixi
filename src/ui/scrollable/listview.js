@@ -1,4 +1,3 @@
-import View from "../view/view";
 import ViewError from "../view/viewerror";
 import ScrollView from "./scrollview";
 import LinearLayout from "../layout/linearlayout";

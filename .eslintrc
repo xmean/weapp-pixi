@@ -10,7 +10,8 @@
     "es6" : true
   },
   "globals": {
-    "wx": false
+    "wx": false,
+    "canvas": true
   },
   "extends": ["eslint:recommended"],
   "rules": {
