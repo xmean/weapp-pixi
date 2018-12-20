@@ -43,17 +43,31 @@ export default class WPX {
     this.loop();
   }
 
-  addPage(id, page) {
-    if (typeof this.pages[id] === 'object') {
-      this.pages[id].destroy();
+  addPage(page) {
+    if(typeof page != 'object') {
+      throw new Error("`page` should be a `Page` object");
     }
 
-    this.pages[id] = page;
+    if (typeof this.pages[page.id] === 'object') {
+      this.pages[page.id].destroy();
+    }
+
+    this.pages[page.id] = page;
   }
 
-  setCurrentPage(id) {
-    let page = this.pages[id];
-    if (page == this.currentPage) {
+  setPage(page) {
+    let id = "";
+
+    if(typeof page === 'object') {
+      id = page.id;
+    } else if(typeof page === 'string') {
+      id = page;
+    } else {
+      throw new Error("`page` should be a `Page` object or a `string` id");
+    }
+
+    let currentPage = this.pages[id];
+    if (currentPage == this.currentPage) {
       return;
     }
 
@@ -61,9 +75,7 @@ export default class WPX {
       this.currentPage.pause();
     }
 
-    this.currentPage = page;
-    this.currentId = id;
-
+    this.currentPage = currentPage;
     this.currentPage.resume();
   }
 }

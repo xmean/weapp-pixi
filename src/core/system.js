@@ -13,11 +13,32 @@ class System {
     this.height = this.windowHeight * this.resolution;
   }
 
-  dp(px) {
-    return px * this.resolution;
+  px(v) {
+    if(typeof v === 'number') {
+      return parseInt(v);
+    }
+
+    if(typeof v === 'string') {
+      let m = v.match(/^([0-9]+)px$/);
+
+      if(m) {
+        return parseInt(m[1]);
+      }
+
+      m = v.match(/^([0-9]+)dp$/);
+      if(m) {
+        return parseInt(m[1]);
+      }
+    }
+
+    throw new Error('`value` should be `px` or `dp`');
   }
 
-  mipmap(id) {
+  resId(id) {
+    if(typeof id != 'string') {
+      throw new Error('`id` should be string texture id');
+    }
+
     let parts = id.split('.');
     let base = parts.slice(0, -1).join('.');
     let ext = parts.slice(-1);

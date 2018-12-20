@@ -3,11 +3,17 @@ import * as PIXI from "pixi.js";
 import View from "./view";
 
 export default class TextView extends View {
-  constructor(style, text) {
-    super(style);
+  constructor(attr, text) {
+    super(attr);
 
     this.text = text;
+    
     this.render();
+  }
+
+  _setAttrs(attr) {
+    super._setAttrs(attr);
+    
   }
 
   render() {
@@ -21,7 +27,7 @@ export default class TextView extends View {
   }
 
   _renderText() {
-    let textStyle = this.style['textStyle' + this.state];
+    let textStyle = this.style['textStyle' + this.selector];
     
     this.textView = new PIXI.Text(this.text, textStyle);
     this._setProperties(this.textView, textStyle, 'alpha');
