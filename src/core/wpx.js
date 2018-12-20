@@ -3,11 +3,11 @@ import * as PIXI from "pixi.js";
 
 export default class WPX {
   constructor(options) {
-    this.width = SYSTEM.windowWidth;
-    this.height = SYSTEM.windowHeight;
-    this.view = SYSTEM.canvas;
+    this.width = SYSTEM.width;
+    this.height = SYSTEM.height;
     this.resolution = SYSTEM.resolution;
-
+    this.view = SYSTEM.canvas;
+    
     // renderer
 
     let rendererOptions = {
@@ -21,7 +21,8 @@ export default class WPX {
     if (typeof options === 'object') {
       Object.assign(rendererOptions, options);
     }
-    this.renderer = new PIXI.WebGLRenderer(rendererOptions);
+    this.renderer = PIXI.autoDetectRenderer(rendererOptions);
+    SYSTEM.renderer = this.renderer;
 
     // pages
 

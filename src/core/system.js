@@ -1,4 +1,3 @@
-import "weapp-pixi-adapter";
 import * as PIXI from "pixi.js";
 
 class System {
@@ -9,6 +8,9 @@ class System {
     this.resolution = systemInfo.pixelRatio;
     this.windowWidth = systemInfo.windowWidth;
     this.windowHeight = systemInfo.windowHeight;
+
+    this.width = this.windowWidth * this.resolution;
+    this.height = this.windowHeight * this.resolution;
   }
 
   dp(px) {

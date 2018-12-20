@@ -1,13 +1,15 @@
+import SYSTEM from "../../core/system";
 import View from "../view/view";
 
 export default class Page extends View {
-  constructor(style, manager) {
+  constructor(style) {
     super(style);
 
-    this.manager = manager;
-    this.pageWidth = this.manager.width;
-    this.pageHeight = this.manager.height;
-
+    this.pageWidth = SYSTEM.width;
+    this.pageHeight = SYSTEM.height;
+    this.resolution = SYSTEM.resolution;
+    this.renderer = SYSTEM.renderer;
+    
     this.paused = true;
   }
 
