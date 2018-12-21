@@ -17,7 +17,7 @@ export default class View extends PIXI.Container {
     'bottom': View.ALIGN_BOTTOM
   };
 
-  constructor(attr) {
+  constructor(attrs, ...args) {
     super();
     
     this.margin = {top: 0, left: 0, bottom: 0, right: 0};
@@ -34,42 +34,44 @@ export default class View extends PIXI.Container {
     this.alignOffsetX = 0;
     this.alignOffsetY = 0;
 
-    this._setAttrs();
+    this.attrs = attrs;
+    if(typeof this.parseAttrs === 'function') {
+      this.parseAttrs(attrs);
+    }
+    
+    if(typeof this.parseArgs === 'function') {
+      this.parseArgs(args);
+    }
+    
+    if(typeof this.onInit === 'function') {
+      this.onInit();
+    }
+    
+    this._render();
   }
 
-  _setAttrs(attr) {
-    if(typeof attr != 'object') {
-      return;
+  _parseAlign(align) {
+    if(typeof align === 'string') {
+      if(align.match(/^(left|center|right|top|middle|bottom)(\|(left|center|right|top|middle|bottom))*$/)) {
+        const aligns = align.split('|');
+        let al = 0;
+
+        for(const a in aligns) {
+          al |= View.ALIGN_MAP[a];
+        }
+
+        return al;
+      } else {
+        throw new Error('`align` should be one of the followings: left|center|right|top|middle|bottom');
+      }
+    } else if(typeof align === 'number') {
+      return parseInt(align);
     }
 
-    this.attr = attr;
-
-    if(typeof this.attr.margin != 'undefined') {
-      this._setBox(this.margin, this.attr.margin);
-    }
-
-    if(typeof this.attr.padding != 'undefined') {
-      this._setBox(this.padding, this.attr.padding);
-    }
-
-    if(typeof this.attr.layoutWidth != 'undefined') {
-      this.layoutWidth = SYSTEM.px(this.attr.layoutWidth);
-    }
-
-    if(typeof this.attr.layoutHeight != 'undefined') {
-      this.layoutHeight = SYSTEM.px(this.attr.layoutHeight);
-    }
-
-    if(typeof this.attr.align != 'undefined') {
-      this.align = this._parseAlign(this.attr.algin);
-    }
-
-    if(typeof this.attr.selector != 'undefined') {
-      this.selector = this.attr.selector;
-    }
+    throw new Error('invalid `align` values');
   }
 
-  _setBox(target, src) {
+  _setSpacing(target, src) {
     if(typeof src != 'object') {
       throw new Error('value should be in `{top:?, left:?, bottom:?, right:?}` format');
     }
@@ -80,7 +82,37 @@ export default class View extends PIXI.Container {
     target.right = SYSTEM.px(src.right);
   }
 
-  _adjustAlignParameters() {
+  parseAttrs(attrs) {
+    if(typeof attrs != 'object') {
+      return;
+    }
+
+    if(typeof attrs.margin != 'undefined') {
+      this._setSpacing(this.margin, attrs.margin);
+    }
+
+    if(typeof attrs.padding != 'undefined') {
+      this._setSpacing(this.padding, attrs.padding);
+    }
+
+    if(typeof attrs.layoutWidth != 'undefined') {
+      this.layoutWidth = SYSTEM.px(attrs.layoutWidth);
+    }
+
+    if(typeof attrs.layoutHeight != 'undefined') {
+      this.layoutHeight = SYSTEM.px(attrs.layoutHeight);
+    }
+
+    if(typeof attrs.align != 'undefined') {
+      this.align = this._parseAlign(attrs.algin);
+    }
+
+    if(typeof attrs.selector != 'undefined') {
+      this.selector = attrs.selector;
+    }
+  }
+
+  _align() {
     if (this.align & View.ALIGN_LEFT) {
       this.alignOffsetX = 0;
     }
@@ -104,6 +136,20 @@ export default class View extends PIXI.Container {
     if (this.align & View.ALIGN_BOTTOM) {
       this.alignOffsetY = this.layoutHeight - this.viewHeight;
     }
+  }
+
+  _measure() {
+    [this.viewWidth, this.viewHeight] = this.onMeasure();
+
+    if(this.layoutWidth == -1) {
+      this.layoutWidth = this.viewWidth;
+    } 
+
+    if(this.layoutHeight == -1) {
+      this.layoutHeight = this.viewHeight;
+    }
+
+    this.hitArea = new PIXI.Rectangle(0, 0, this.layoutWidth, this.layoutHeight);
   }
 
   _renderBackground() {
@@ -147,49 +193,16 @@ export default class View extends PIXI.Container {
     }
   }
 
-  _setProperties(targetObj, sourceObj, ...properties) {
-    if(typeof sourceObj == 'undefined' || typeof targetObj == 'undefined') {
-      return;
-    }
-
-    for(let property of properties) {
-      if(typeof sourceObj[property] != 'undefined') {
-        targetObj[property] = sourceObj[property];
-      }
-    }
-  }
-
-  _parseAlign(align) {
-    if(typeof align === 'string') {
-      if(align.match(/^(left|center|right|top|middle|bottom)(\|(left|center|right|top|middle|bottom))*$/)) {
-        const aligns = align.split('|');
-        let al = 0;
-
-        for(const a in aligns) {
-          al |= View.ALIGN_MAP[a];
-        }
-
-        return al;
-      } else {
-        throw new Error('`align` should be one of the followings: left|center|right|top|middle|bottom');
-      }
-    } else if(typeof align === 'number') {
-      return parseInt(align);
-    }
-
-    throw new Error('invalid `align` values');
+  _render() {
+    this.onRender();
+    this._measure();
+    this._align();
+    this.onLayout();
+    this._renderBackground();
   }
 
   update() {
     
-  }
-
-  setMargin(margin) {
-    this._setBox(this.margin, margin);
-  }
-
-  setMarginBottom(bottom) {
-    this.margin.bottom = SYSTEM.px(bottom);
   }
 
   setOnClick(onClick) {

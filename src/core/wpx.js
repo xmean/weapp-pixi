@@ -1,6 +1,8 @@
 import SYSTEM from "./system";
 import * as PIXI from "pixi.js";
 
+import Page from "./page";
+
 export default class WPX {
   constructor(options) {
     this.width = SYSTEM.width;
@@ -30,7 +32,7 @@ export default class WPX {
   }
 
   loop() {
-    if (typeof this.currentPage === 'undefined' || this.currentPage.isPaused()) {
+    if (!(this.currentPage instanceof Page) || this.currentPage.isPaused()) {
       return;
     }
     this.currentPage.update();
@@ -43,39 +45,41 @@ export default class WPX {
     this.loop();
   }
 
-  addPage(page) {
-    if(typeof page != 'object') {
-      throw new Error("`page` should be a `Page` object");
+  addPage(id, page) {
+    if(!(page instanceof Page)) {
+      throw new Error("addPage: `page` should be a `Page` object");
     }
 
-    if (typeof this.pages[page.id] === 'object') {
-      this.pages[page.id].destroy();
+    if (typeof this.pages[id] === 'object') {
+      this.pages[id].destroy();
     }
 
-    this.pages[page.id] = page;
+    this.pages[id] = page;
   }
 
-  setPage(page) {
-    let id = "";
+  setPage(id, onPageTransition) {
+    let currentPage = this.pages[id];
 
-    if(typeof page === 'object') {
-      id = page.id;
-    } else if(typeof page === 'string') {
-      id = page;
-    } else {
-      throw new Error("`page` should be a `Page` object or a `string` id");
+    if(!(currentPage instanceof Page)) {
+      throw new Error("setPage: `page` should be a `Page` object or a `string` id");
     }
 
-    let currentPage = this.pages[id];
-    if (currentPage == this.currentPage) {
+    if (currentPage === this.currentPage) {
       return;
     }
 
-    if (typeof this.currentPage === 'object') {
+    if(this.currentPage instanceof Page) {
       this.currentPage.pause();
     }
-
-    this.currentPage = currentPage;
-    this.currentPage.resume();
+    
+    if(typeof onPageTransition === 'function') {
+      onPageTransition(this.currentPage, currentPage, () => {
+        this.currentPage = currentPage;
+        this.currentPage.resume();
+      });
+    } else {
+      this.currentPage = currentPage;
+      this.currentPage.resume();
+    }
   }
 }

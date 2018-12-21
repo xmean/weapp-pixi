@@ -1,6 +1,6 @@
-import Layout from "./layout";
+import ViewGroup from "../view/viewgroup";
 
-export default class GridLayout extends Layout {
+export default class GridLayout extends ViewGroup {
   static LAYOUT_BY_ROW = 0x00;
   static LAYOUT_BY_COL = 0x01;
 

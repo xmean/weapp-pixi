@@ -3,27 +3,12 @@ import * as PIXI from "pixi.js";
 import View from "./view";
 
 export default class TextView extends View {
-  constructor(attr, text) {
-    super(attr);
-
-    this.text = text;
-    
-    this.render();
+  parseArgs(args) {
+    this.text = args[0];
   }
 
-  _setAttrs(attr) {
-    super._setAttrs(attr);
-    
-  }
+  onInit() {
 
-  render() {
-    this.removeChildren();
-
-    this._renderText();
-    this._renderIcons();
-    
-    this._layout();
-    this._renderBackground();
   }
 
   _renderText() {
@@ -68,10 +53,28 @@ export default class TextView extends View {
     }
   }
 
-  _layout() {
-    this._updateLayoutParameters();
-    this._adjustAlignParameters();
+  onRender() {
+    this.removeChildren();
+    this._renderText();
+    this._renderIcons();
+  }
 
+  onMeasure() {
+    const viewWidth = this.padding.left + 
+      (typeof this.iconViewLeft != 'undefined' ? (this.iconViewLeftWidth + this.iconViewLeftPadding) : 0) + 
+      this.textView.width +
+      (typeof this.iconViewRight != 'undefined' ? (this.iconViewRightPadding + this.iconViewRightWidth) : 0) + 
+      this.padding.right;
+    const viewHeight = this.padding.top + 
+      (typeof this.iconViewTop != 'undefined' ? (this.iconViewTopHeight + this.iconViewTopPadding) : 0) +
+      this.textView.height + 
+      (typeof this.iconViewBottom != 'undefined' ? (this.iconViewBottomPadding + this.iconViewBottomHeight) : 0) + 
+      this.padding.bottom;
+    
+    return [viewWidth, viewHeight];
+  }
+
+  onLayout() {
     let x = this.alignOffsetX + this.padding.left;
     let y = this.alignOffsetY + this.padding.top + (typeof this.iconViewTop != 'undefined' ? (this.iconViewTopHeight + this.iconViewTopPadding) : 0);
     let height = Math.max(this.textView.height, this.iconViewLeftHeight, this.iconViewRightHeight);
@@ -102,36 +105,11 @@ export default class TextView extends View {
     }
   }
 
-  _updateLayoutParameters() {
-    this.viewWidth = 
-      this.padding.left + 
-      (typeof this.iconViewLeft != 'undefined' ? (this.iconViewLeftWidth + this.iconViewLeftPadding) : 0) + 
-      this.textView.width +
-    (typeof this.iconViewRight != 'undefined' ? (this.iconViewRightPadding + this.iconViewRightWidth) : 0) + 
-      this.padding.right;
-    this.viewHeight = 
-      this.padding.top + 
-    (typeof this.iconViewTop != 'undefined' ? (this.iconViewTopHeight + this.iconViewTopPadding) : 0) +
-      this.textView.height + 
-    (typeof this.iconViewBottom != 'undefined' ? (this.iconViewBottomPadding + this.iconViewBottomHeight) : 0) + 
-      this.padding.bottom;
-
-    if(this.layoutWidth == -1) {
-      this.layoutWidth = this.viewWidth;
-    }
-    
-    if(this.layoutHeight == -1) {
-      this.layoutHeight = this.viewHeight;
-    }
-
-    this.hitArea = new PIXI.Rectangle(0, 0, this.layoutWidth, this.layoutHeight);
-  }
-
   setText(text) {
     if (this.text != text) {
       this.text = text;
-
-      this.render();
+      
+      this._render();
     }
   }
 }

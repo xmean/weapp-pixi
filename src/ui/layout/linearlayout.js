@@ -1,26 +1,66 @@
-import * as PIXI from "pixi.js";
+import ViewGroup from "../view/viewgroup";
+import ViewError from "../view/viewerror";
 
-import View from "../view/view";
-import Layout from "./layout";
-
-export default class LinearLayout extends Layout {
+export default class LinearLayout extends ViewGroup {
   static LAYOUT_VERTICAL = 0x00;
   static LAYOUT_HORIZONTAL = 0x01;
 
-  constructor(style, direction) {
-    super(style);
-
-    this.direction = direction;
+  parseArgs(args) {
+    this.direction = this._parseLayoutDirection(args[0]);
   }
 
-  render() {
-    this._layout();
-    this._renderBackground();
+  _parseLayoutDirection(direction) {
+    if(typeof direction === 'number') {
+      if(direction != LinearLayout.LAYOUT_VERTICAL || direction != LinearLayout.LAYOUT_HORIZONTAL) {
+        throw new ViewError('invalid LinearLayout `direction`: ' + direction);
+      }
+
+      return direction;
+    }
+
+    if(typeof direction === 'string') {
+      if(direction === 'vertical') {
+        return LinearLayout.LAYOUT_VERTICAL;
+      } else if(direction === 'horizontal') {
+        return LinearLayout.LAYOUT_HORIZONTAL;
+      }
+    }
+
+    throw new ViewError('`direction` of LinearLayout should be `vertical | horizontal` or `LinearLayout.LAYOUT_VERTICAL | LinearLayout.LAYOUT_HORIZONTAL`');
   }
 
-  _layout() {
-    this._updateLayoutParameters();
-    this._adjustAlignParameters();
+  _layoutVertical() {
+    const x =  this.alignOffsetX + this.padding.left;
+    let y =  this.padding.top;
+
+    for (let view of this.views) {
+      y += view.margin.top;
+      
+      view.x = x;
+      view.y = y;
+      this.addChild(view);
+
+      y += (view.layoutHeight + view.margin.bottom);
+    }
+  }
+
+  _layoutHorizontal() {
+    let x = this.padding.left;
+    const y = this.alignOffsetY + this.padding.top;
+
+    for (let view of this.views) {
+      x += view.margin.left;
+
+      view.x = x;
+      view.y = y;
+      this.addChild(view);
+
+      x += (view.layoutWidth + view.margin.right);
+    }
+  }
+  
+  onLayout() {
+    this.removeChildren();
 
     if(this.direction == LinearLayout.LAYOUT_HORIZONTAL) {
       this._layoutHorizontal();
@@ -29,7 +69,7 @@ export default class LinearLayout extends Layout {
     }
   }
 
-  _updateLayoutParameters() {
+  onMeasure() {
     if(this.direction == LinearLayout.LAYOUT_VERTICAL) {
       let maxWidth = 0;
       let viewWidth = 0;
@@ -42,8 +82,11 @@ export default class LinearLayout extends Layout {
 
         viewHeight += (view.margin.top + view.layoutHeight + view.margin.bottom);
       }
-      this.viewWidth = this.padding.left + maxWidth + this.padding.right;
-      this.viewHeight = this.padding.top + viewHeight + this.padding.bottom;
+
+      return [
+        this.padding.left + maxWidth + this.padding.right, 
+        this.padding.top + viewHeight + this.padding.bottom
+      ];
     } else if(this.direction == LinearLayout.LAYOUT_HORIZONTAL) {
       let maxHeight = 0;
       let viewWidth = 0;
@@ -56,73 +99,13 @@ export default class LinearLayout extends Layout {
 
         viewWidth += (view.margin.left + view.layoutWidth + view.margin.right);
       }
-      this.viewWidth = this.padding.left + viewWidth + this.padding.right;
-      this.viewHeight = this.padding.top + viewHeight + this.padding.bottom;
-    }
-
-    if(this.layoutWidth == -1) {
-      this.layoutWidth = this.viewWidth;
-    } 
-
-    if(this.layoutHeight == -1) {
-      this.layoutHeight = this.viewHeight;
-    }
-
-    this.hitArea = new PIXI.Rectangle(0, 0, this.layoutWidth, this.layoutHeight);
-  }
-
-  _layoutVertical() {
-    this.removeChildren();
-    let x =  this.padding.left;
-    let y =  this.padding.top;
-    for (let view of this.views) {
-      y += view.margin.top;
       
-      if (this.align & View.ALIGN_LEFT) {
-        x = this.padding.left + view.margin.right;
-      }
-
-      if (this.align & View.ALIGN_CENTER) {
-        x = (this.layoutWidth - view.layoutWidth) / 2;
-      }
-
-      if (this.align & View.ALIGN_RIGHT) {
-        x = this.layoutWidth - view.layoutWidth;
-      }
-
-      view.x = x;
-      view.y = y;
-      this.addChild(view);
-
-      y += (view.layoutHeight + view.margin.bottom);
+      return [
+        this.padding.left + viewWidth + this.padding.right,
+        this.padding.top + viewHeight + this.padding.bottom
+      ];
     }
-  }
 
-  _layoutHorizontal() {
-    this.removeChildren();
-
-    let x = this.padding.left;
-    let y = this.padding.top;
-    for (let view of this.views) {
-      x += view.margin.left;
-
-      if (this.algin & View.ALIGN_TOP) {
-        y = this.padding.top + view.margin.top;
-      }
-
-      if (this.align & View.ALIGN_MIDDLE) {
-        y = (this.layoutHeight - view.layoutHeight) / 2;
-      }
-
-      if (this.align & View.ALIGN_BOTTOM) {
-        y = this.layoutHeight - view.layoutHeight;
-      }
-
-      view.x = x;
-      view.y = y;
-      this.addChild(view);
-
-      x += (view.layoutWidth + view.margin.right);
-    }
+    return [0, 0];
   }
 } 

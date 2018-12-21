@@ -9,9 +9,6 @@ import TextView from "./view/textview";
 import ListView from "./scrollable/listview";
 import ScrollView from "./scrollable/scrollview";
 
-import Page from "./page/page";
-
-import Layout from "./layout/layout";
 import LinearLayout from "./layout/linearlayout";
 import GridLayout from "./layout/gridlayout";
 
@@ -32,9 +29,6 @@ UI.TextView = TextView;
 UI.ListView = ListView;
 UI.ScrollView = ScrollView;
 
-UI.Page = Page;
-
-UI.Layout = Layout;
 UI.LinearLayout = LinearLayout;
 UI.GridLayout = GridLayout;
 

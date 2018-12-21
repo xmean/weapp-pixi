@@ -34,6 +34,10 @@ class System {
     throw new Error('`value` should be `px` or `dp`');
   }
 
+  dp(v) {
+    return v * this.resolution;
+  }
+
   resId(id) {
     if(typeof id != 'string') {
       throw new Error('`id` should be string texture id');
