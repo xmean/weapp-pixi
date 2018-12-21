@@ -1,6 +1,6 @@
 {
   "name": "weapp-pixi",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "weapp-pixi(wpx)：基于pixi.js的微信小游戏框架",
   "main": "dist/weapp-pixi.js",
   "module": "src/index.js",
