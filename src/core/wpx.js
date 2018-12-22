@@ -47,13 +47,14 @@ export default class WPX {
 
   addPage(id, page) {
     if(!(page instanceof Page)) {
-      throw new Error("addPage: `page` should be a `Page` object");
+      throw new Error("addPage: the 2nd param should be a `Page` object");
     }
 
     if (typeof this.pages[id] === 'object') {
       this.pages[id].destroy();
     }
 
+    page.context = this;
     this.pages[id] = page;
   }
 

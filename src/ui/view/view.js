@@ -17,14 +17,27 @@ export default class View extends PIXI.Container {
     'bottom': View.ALIGN_BOTTOM
   };
 
+  static ATTR_VALUE = 0;
+  static ATTR_SIZE = 1; // size: 1 | '1px' | '1dp'
+  static ATTR_RECT = 2; // { top: 1 | '1px' | '1dp', left: ..., bottom: ..., right: ... }
+  static ATTR_ALIGN = 3; // 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom'
+  static ATTR_TEXTSTYLE = 4; // { fontSize: 1 | '1px' | '1dp' }
+  static ATTR_TEXTURE = 5; // 'id'
+
+  static LAYOUT_WRAP_CONTENT = 0;
+  static LAYOUT_EXACT = 1;
+
   constructor(attrs, ...args) {
     super();
     
     this.margin = {top: 0, left: 0, bottom: 0, right: 0};
     this.padding = {top: 0, left: 0, bottom: 0, right: 0};
+
+    this.layoutHintWidth = View.LAYOUT_WRAP_CONTENT;
+    this.layoutHintHeight = View.LAYOUT_WRAP_CONTENT;
     
-    this.layoutWidth = -1;
-    this.layoutHeight = -1;
+    this.layoutWidth = 0;
+    this.layoutHeight = 0;
 
     this.align = View.ALIGN_TOP | View.ALIGN_LEFT;
     this.selector = "";
@@ -35,28 +48,19 @@ export default class View extends PIXI.Container {
     this.alignOffsetY = 0;
 
     this.attrs = attrs;
-    if(typeof this.parseAttrs === 'function') {
-      this.parseAttrs(attrs);
-    }
-    
-    if(typeof this.parseArgs === 'function') {
-      this.parseArgs(args);
-    }
-    
-    if(typeof this.onInit === 'function') {
-      this.onInit();
-    }
-    
+    this._parseAttrs(attrs);
+    this._parseArgs(args);
+    this._init();
     this._render();
   }
 
-  _parseAlign(align) {
+  _parseAttrAlign(align) {
     if(typeof align === 'string') {
       if(align.match(/^(left|center|right|top|middle|bottom)(\|(left|center|right|top|middle|bottom))*$/)) {
         const aligns = align.split('|');
         let al = 0;
 
-        for(const a in aligns) {
+        for(const a of aligns) {
           al |= View.ALIGN_MAP[a];
         }
 
@@ -71,44 +75,124 @@ export default class View extends PIXI.Container {
     throw new Error('invalid `align` values');
   }
 
-  _setSpacing(target, src) {
-    if(typeof src != 'object') {
-      throw new Error('value should be in `{top:?, left:?, bottom:?, right:?}` format');
+  _parseAttrRect(spacing) {
+    if(typeof spacing != 'object') {
+      return null;
     }
 
-    target.top = SYSTEM.px(src.top);
-    target.left = SYSTEM.px(src.left);
-    target.bottom = SYSTEM.px(src.bottom);
-    target.right = SYSTEM.px(src.right);
+    if(typeof spacing.top != 'undefined') {
+      spacing.top = SYSTEM.px(spacing.top);
+    }
+
+    if(typeof spacing.left != 'undefined') {
+      spacing.left = SYSTEM.px(spacing.left);
+    }
+
+    if(typeof spacing.bottom != 'undefined') {
+      spacing.bottom = SYSTEM.px(spacing.bottom);
+    }
+
+    if(typeof spacing.right != 'undefined') {
+      spacing.right = SYSTEM.px(spacing.right);
+    }
+
+    return spacing;
   }
 
-  parseAttrs(attrs) {
-    if(typeof attrs != 'object') {
+  _parseAttrSize(size) {
+    return SYSTEM.px(size);
+  }
+
+  _parseAttrTextStyle(style) {
+    if(typeof style != 'object') {
+      return null;
+    }
+
+    if(typeof style.fontSize != 'undefined') {
+      style.fontSize = SYSTEM.px(style.fontSize);
+    }
+
+    return style;
+  }
+
+  _parseAttrTexture(id) {
+    return SYSTEM.resId(id);
+  }
+
+  _setAttrs(target, src, type, selector, ...properties) {
+    if(typeof target != 'object' || typeof src != 'object') {
       return;
     }
 
-    if(typeof attrs.margin != 'undefined') {
-      this._setSpacing(this.margin, attrs.margin);
+    for(const p of properties) {
+      if(typeof src[p] != 'undefined') {
+        if(type === View.ATTR_SIZE) {
+          target[p] = this._parseAttrSize(typeof src[p + selector] != 'undefined' ? src[p + selector] : src[p]);
+        } else if(type === View.ATTR_ALIGN) {
+          target[p] = this._parseAttrAlign(typeof src[p + selector] != 'undefined' ? src[p + selector] : src[p]);
+        } else if(type === View.ATTR_RECT) {
+          if(typeof target[p] === 'undefined') {
+            target[p] = {};
+          }
+
+          Object.assign(target[p], this._parseAttrRect(typeof src[p + selector] != 'undefined' ? src[p + selector] : src[p]));
+        } else if(type === View.ATTR_TEXTSTYLE) {
+          if(typeof target[p] === 'undefined') {
+            target[p] = {};
+          }
+          Object.assign(target[p], this._parseAttrTextStyle(typeof src[p + selector] != 'undefined' ? src[p + selector] : src[p]));
+        } else if(typeof type === View.ATTR_TEXTURE) {
+          target[p] = this._parseAttrTexture(typeof src[p + selector] != 'undefined' ? src[p + selector] : src[p]); 
+        } else if(typeof type === 'function') {
+          target[p] = type(typeof src[p + selector] != 'undefined' ? src[p + selector] : src[p]);
+        } else {
+          target[p] = typeof src[p + selector] != 'undefined' ? src[p + selector] : src[p];
+        }
+      }
+    }
+  }
+
+  _parseAttrs(attrs) {
+    this._setAttrs(this, attrs, View.ATTR_RECT, this.selector, 'margin', 'padding');
+    this._setAttrs(this, attrs, View.ATTR_ALIGN, this.selector, 'align');
+    this._setAttrs(this, attrs, View.ATTR_SIZE, this.selector, 'layoutWidth', 'layoutHeight');
+    this._setAttrs(this, attrs, View.ATTR_VALUE, '', 'selector');
+
+    if(typeof this.onParseAttrs === 'function') {
+      this.onParseAttrs(attrs);
+    }
+  }
+
+  _updateAttrs() {
+    this.parseAttrs(this.attrs);
+  }
+
+  _parseArgs(args) {
+    if(typeof this.onParseArgs === 'function') {
+      this.onParseArgs(args);
+    }
+  }
+
+  _init() {
+    if(this.layoutWidth > 0) {
+      this.layoutHintWidth = View.LAYOUT_EXACT;
     }
 
-    if(typeof attrs.padding != 'undefined') {
-      this._setSpacing(this.padding, attrs.padding);
+    if(this.layoutHeight > 0) {
+      this.layoutHintHeight = View.LAYOUT_EXACT;
     }
 
-    if(typeof attrs.layoutWidth != 'undefined') {
-      this.layoutWidth = SYSTEM.px(attrs.layoutWidth);
+    // events
+
+    this.interactive = true;
+    this.tap = (e) => {
+      if(typeof this.onClick === 'function') {
+        this.onClick(e);
+      }
     }
 
-    if(typeof attrs.layoutHeight != 'undefined') {
-      this.layoutHeight = SYSTEM.px(attrs.layoutHeight);
-    }
-
-    if(typeof attrs.align != 'undefined') {
-      this.align = this._parseAlign(attrs.algin);
-    }
-
-    if(typeof attrs.selector != 'undefined') {
-      this.selector = attrs.selector;
+    if(typeof this.onInit === 'function') {
+      this.onInit();
     }
   }
 
@@ -139,13 +223,15 @@ export default class View extends PIXI.Container {
   }
 
   _measure() {
-    [this.viewWidth, this.viewHeight] = this.onMeasure();
-
-    if(this.layoutWidth == -1) {
+    if(typeof this.onMeasure === 'function') {
+      [this.viewWidth, this.viewHeight] = this.onMeasure();
+    }
+    
+    if(this.layoutHintWidth === View.LAYOUT_WRAP_CONTENT) {
       this.layoutWidth = this.viewWidth;
     } 
 
-    if(this.layoutHeight == -1) {
+    if(this.layoutHintHeight === View.LAYOUT_WRAP_CONTENT) {
       this.layoutHeight = this.viewHeight;
     }
 
@@ -153,52 +239,63 @@ export default class View extends PIXI.Container {
   }
 
   _renderBackground() {
-    let backgroundStyle = this.style['backgroundStyle' + this.state];
-    if (typeof backgroundStyle == 'undefined') {
-      delete this.backgroundView;
-      return;
-    }
+    // let backgroundStyle = this.style['backgroundStyle' + this.state];
+    // if (typeof backgroundStyle == 'undefined') {
+    //   delete this.backgroundView;
+    //   return;
+    // }
 
-    this.removeChild(this.backgroundView);
-    delete this.backgroundView;
+    // this.removeChild(this.backgroundView);
+    // delete this.backgroundView;
     
-    if (backgroundStyle.backgroundType == 'circle') {
-      let r = Math.min(this.layoutWidth, this.layoutHeight) / 2;
+    // if (backgroundStyle.backgroundType == 'circle') {
+    //   let r = Math.min(this.layoutWidth, this.layoutHeight) / 2;
 
-      this.backgroundView = new PIXI.Graphics();
-      this.backgroundView.lineStyle(backgroundStyle.borderWidth, backgroundStyle.borderColor, backgroundStyle.borderAlpha);
-      this.backgroundView.beginFill(backgroundStyle.fillColor, backgroundStyle.fillAlpha);
-      this.backgroundView.drawCircle(r, r, r);
-      this.backgroundView.endFill();
-      this.addChildAt(this.backgroundView, 0);
-    } else if(backgroundStyle.backgroundType == 'roundedRect') {
-      let cornerRadius = backgroundStyle.cornerRadius;
-      if(cornerRadius > 0 && cornerRadius < 1) {
-        cornerRadius = cornerRadius * Math.min(this.layoutWidth, this.layoutHeight);
-      }
+    //   this.backgroundView = new PIXI.Graphics();
+    //   this.backgroundView.lineStyle(backgroundStyle.borderWidth, backgroundStyle.borderColor, backgroundStyle.borderAlpha);
+    //   this.backgroundView.beginFill(backgroundStyle.fillColor, backgroundStyle.fillAlpha);
+    //   this.backgroundView.drawCircle(r, r, r);
+    //   this.backgroundView.endFill();
+    //   this.addChildAt(this.backgroundView, 0);
+    // } else if(backgroundStyle.backgroundType == 'roundedRect') {
+    //   let cornerRadius = backgroundStyle.cornerRadius;
+    //   if(cornerRadius > 0 && cornerRadius < 1) {
+    //     cornerRadius = cornerRadius * Math.min(this.layoutWidth, this.layoutHeight);
+    //   }
 
-      this.backgroundView = new PIXI.Graphics();
-      this.backgroundView.lineStyle(backgroundStyle.borderWidth, backgroundStyle.borderColor, backgroundStyle.borderAlpha);
-      this.backgroundView.beginFill(backgroundStyle.fillColor, backgroundStyle.fillAlpha);
-      this.backgroundView.drawRoundedRect(0, 0, this.layoutWidth, this.layoutHeight, cornerRadius);
-      this.backgroundView.endFill();
-      this.addChildAt(this.backgroundView, 0);
-    } else if(backgroundStyle.backgroundType == 'rect') {
-      this.backgroundView = new PIXI.Graphics();
-      this.backgroundView.lineStyle(backgroundStyle.borderWidth, backgroundStyle.borderColor, backgroundStyle.borderAlpha);
-      this.backgroundView.beginFill(backgroundStyle.fillColor, backgroundStyle.fillAlpha);
-      this.backgroundView.drawRect(0, 0, this.layoutWidth, this.layoutHeight);
-      this.backgroundView.endFill();
-      this.addChildAt(this.backgroundView, 0);
-    }
+    //   this.backgroundView = new PIXI.Graphics();
+    //   this.backgroundView.lineStyle(backgroundStyle.borderWidth, backgroundStyle.borderColor, backgroundStyle.borderAlpha);
+    //   this.backgroundView.beginFill(backgroundStyle.fillColor, backgroundStyle.fillAlpha);
+    //   this.backgroundView.drawRoundedRect(0, 0, this.layoutWidth, this.layoutHeight, cornerRadius);
+    //   this.backgroundView.endFill();
+    //   this.addChildAt(this.backgroundView, 0);
+    // } else if(backgroundStyle.backgroundType == 'rect') {
+    //   this.backgroundView = new PIXI.Graphics();
+    //   this.backgroundView.lineStyle(backgroundStyle.borderWidth, backgroundStyle.borderColor, backgroundStyle.borderAlpha);
+    //   this.backgroundView.beginFill(backgroundStyle.fillColor, backgroundStyle.fillAlpha);
+    //   this.backgroundView.drawRect(0, 0, this.layoutWidth, this.layoutHeight);
+    //   this.backgroundView.endFill();
+    //   this.addChildAt(this.backgroundView, 0);
+    // }
   }
 
   _render() {
-    this.onRender();
+    if(typeof this.onRender === 'function') {
+      this.onRender();
+    }
+    
     this._measure();
     this._align();
-    this.onLayout();
+
+    if(typeof this.onLayout === 'function') {
+      this.onLayout();
+    }
+    
     this._renderBackground();
+  }
+
+  invalidate() {
+    this._render();
   }
 
   update() {
@@ -218,8 +315,9 @@ export default class View extends PIXI.Container {
   setSelector(selector) {
     if (this.selector != selector) {
       this.selector = selector;
-
-      this.render();
+      
+      this._updateAttrs();
+      this._render();
     }
   }
 }

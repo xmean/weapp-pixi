@@ -2,7 +2,7 @@ import View from "./view";
 import ViewError from "./viewerror";
 
 export default class ViewGroup extends View {
-  setArgs() {
+  onInit() {
     this.childViews = [];
   }
   
@@ -14,27 +14,33 @@ export default class ViewGroup extends View {
 
   addChildView(view) {
     this._validateView(view);
-    this.childViews.push(view);
 
-    this._render();
+    this.childViews.push(view);
+    this.addChild(view);
+
+    this.invalidate();
   }
 
   addChildViews(...views) {
     for (const view of views) {
-      this.validateView(view);
-      this.views.push(view);
+      this._validateView(view);
+
+      this.childViews.push(view);
+      this.addChild(view);
     }
 
-    this._render();
+    this.invalidate();
   }
 
   addChildViewList(viewList) {
     for (const view of viewList) {
-      this.validateView(view);
-      this.views.push(view);
+      this._validateView(view);
+
+      this.childViews.push(view);
+      this.addChild(view);
     }
     
-    this._render();
+    this.invalidate();
   }
 
   update() {

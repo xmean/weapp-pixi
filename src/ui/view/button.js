@@ -1,8 +1,8 @@
 import TextView from "./textview";
 
 export default class Button extends TextView {
-  constructor(style, text, onClick) {
-    super(style, text);
+  constructor(attr, text, onClick) {
+    super(attr, text);
 
     this.setOnClick(onClick);
   }

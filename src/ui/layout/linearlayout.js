@@ -5,13 +5,13 @@ export default class LinearLayout extends ViewGroup {
   static LAYOUT_VERTICAL = 0x00;
   static LAYOUT_HORIZONTAL = 0x01;
 
-  parseArgs(args) {
+  onParseArgs(args) {
     this.direction = this._parseLayoutDirection(args[0]);
   }
 
   _parseLayoutDirection(direction) {
     if(typeof direction === 'number') {
-      if(direction != LinearLayout.LAYOUT_VERTICAL || direction != LinearLayout.LAYOUT_HORIZONTAL) {
+      if(direction != LinearLayout.LAYOUT_VERTICAL && direction != LinearLayout.LAYOUT_HORIZONTAL) {
         throw new ViewError('invalid LinearLayout `direction`: ' + direction);
       }
 
@@ -31,41 +31,29 @@ export default class LinearLayout extends ViewGroup {
 
   _layoutVertical() {
     const x =  this.alignOffsetX + this.padding.left;
-    let y =  this.padding.top;
+    let y =  this.alignOffsetY + this.padding.top;
 
-    for (let view of this.views) {
+    for (const view of this.childViews) {
       y += view.margin.top;
       
       view.x = x;
       view.y = y;
-      this.addChild(view);
 
       y += (view.layoutHeight + view.margin.bottom);
     }
   }
 
   _layoutHorizontal() {
-    let x = this.padding.left;
+    let x = this.alignOffsetX + this.padding.left;
     const y = this.alignOffsetY + this.padding.top;
 
-    for (let view of this.views) {
+    for (const view of this.childViews) {
       x += view.margin.left;
 
       view.x = x;
       view.y = y;
-      this.addChild(view);
 
       x += (view.layoutWidth + view.margin.right);
-    }
-  }
-  
-  onLayout() {
-    this.removeChildren();
-
-    if(this.direction == LinearLayout.LAYOUT_HORIZONTAL) {
-      this._layoutHorizontal();
-    } else if(this.direction == LinearLayout.LAYOUT_VERTICAL) {
-      this._layoutVertical();
     }
   }
 
@@ -74,7 +62,7 @@ export default class LinearLayout extends ViewGroup {
       let maxWidth = 0;
       let viewWidth = 0;
       let viewHeight = 0;
-      for(let view of this.views) {
+      for(const view of this.childViews) {
         viewWidth = view.margin.left + view.layoutWidth + view.margin.right;
         if(viewWidth > maxWidth) {
           maxWidth = viewWidth;
@@ -91,7 +79,7 @@ export default class LinearLayout extends ViewGroup {
       let maxHeight = 0;
       let viewWidth = 0;
       let viewHeight = 0;
-      for(let view of this.views) {
+      for(const view of this.childViews) {
         viewHeight = view.margin.top + view.layoutHeight + view.margin.bottom;
         if(viewHeight > maxHeight) {
           maxHeight = viewHeight;
@@ -106,6 +94,14 @@ export default class LinearLayout extends ViewGroup {
       ];
     }
 
-    return [0, 0];
+    return [-1, -1];
+  }
+
+  onLayout() {
+    if(this.direction == LinearLayout.LAYOUT_HORIZONTAL) {
+      this._layoutHorizontal();
+    } else if(this.direction == LinearLayout.LAYOUT_VERTICAL) {
+      this._layoutVertical();
+    }
   }
 } 

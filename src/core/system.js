@@ -19,7 +19,12 @@ class System {
     }
 
     if(typeof v === 'string') {
-      let m = v.match(/^([0-9]+)px$/);
+      let m = v.match(/^([0-9]+)$/);
+      if(m) {
+        return parseInt(m[1]);
+      }
+
+      m = v.match(/^([0-9]+)px$/);
 
       if(m) {
         return parseInt(m[1]);
@@ -27,7 +32,7 @@ class System {
 
       m = v.match(/^([0-9]+)dp$/);
       if(m) {
-        return parseInt(m[1]);
+        return parseInt(m[1]) * this.resolution;
       }
     }
 
