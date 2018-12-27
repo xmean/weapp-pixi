@@ -1,13 +1,15 @@
-import WPX from "./core/wpx";
-import SYSTEM from "./core/system";
-import Page from "./core/page";
+import WPX from './core/wpx';
+import SYSTEM from './core/system';
+import Page from './core/page';
 
-import Tween from "./tween/tween";
-import ResLoader from "./loader/loader";
-import UI from "./ui/index";
+import Tween from './tween/tween';
+import ResLoader from './loader/loader';
+import UI from './ui/index';
 
-import DrawUtils from "./utils/drawutils";
-import MathUtils from "./utils/mathutils";
+import Prebuild from './model/prebuild';
+
+import DrawUtils from './utils/drawutils';
+import MathUtils from './utils/mathutils';
 
 // namespace
 
@@ -16,6 +18,9 @@ WPX.SYSTEM = SYSTEM;
 WPX.ResLoader = ResLoader;
 WPX.UI = UI;
 WPX.Tween = Tween;
+
+WPX.Prebuild = Prebuild;
+
 WPX.DrawUtils = DrawUtils;
 WPX.MathUtils = MathUtils;
 

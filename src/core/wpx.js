@@ -17,13 +17,19 @@ export default class WPX {
       height: this.height,
       view: this.view,
       resolution: this.resolution,
-      antialias: true
+      antialias: true,
+      forceWebGL: false
     }
 
     if (typeof options === 'object') {
       Object.assign(rendererOptions, options);
     }
-    this.renderer = PIXI.autoDetectRenderer(rendererOptions);
+
+    if(rendererOptions.forceWebGL) {
+      this.renderer = new PIXI.WebGLRenderer(rendererOptions);
+    } else {
+      this.renderer = PIXI.autoDetectRenderer(rendererOptions);
+    }
     SYSTEM.renderer = this.renderer;
 
     // pages
