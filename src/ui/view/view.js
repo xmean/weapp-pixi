@@ -115,8 +115,28 @@ export default class View extends PIXI.Container {
     return style;
   }
 
-  _parseAttrTexture(id) {
-    return SYSTEM.resId(id);
+  _parseAttrTextureStyle(style) {
+    if(typeof style != 'object') {
+      return null;
+    }
+
+    if(typeof style.resId != 'undefined') {
+      style.resId = SYSTEM.resId(style.resId);
+    }
+
+    if(typeof style.width != 'undefined') {
+      style.width = SYSTEM.px(style.width);
+    }
+
+    if(typeof style.height != 'undefined') {
+      style.height = SYSTEM.px(style.height);
+    }
+
+    if(typeof style.padding != 'undefined') {
+      style.padding = SYSTEM.px(style.padding);
+    }
+
+    return style;
   }
 
   _setAttrs(target, src, type, selector, ...properties) {
@@ -164,7 +184,7 @@ export default class View extends PIXI.Container {
   }
 
   _updateAttrs() {
-    this.parseAttrs(this.attrs);
+    this._parseAttrs(this.attrs);
   }
 
   _parseArgs(args) {

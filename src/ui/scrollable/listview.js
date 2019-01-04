@@ -9,7 +9,7 @@ export default class ListView extends ScrollView {
   static LAYOUT_GRID_BY_ROW = 0x02;
   static LAYOUT_GRID_BY_COL = 0x03;
 
-  constructor(style, width, height, items, onCreateItemView, layout, rowCount, colCount) {
+  constructor(attrs, width, height, items, onCreateItemView, layout, rowCount, colCount) {
     if(typeof onCreateItemView != 'function') {
       throw new ViewError("onCreateItemView must be implemented");
     }
@@ -25,15 +25,15 @@ export default class ListView extends ScrollView {
       view = new LinearLayout({}, LinearLayout.LAYOUT_VERTICAL);
     }
 
-    let itemViews = [];
+    const itemViews = [];
     for (let i = 0; i < items.length; i++) {
-      let item = items[i];
-      let itemView = onCreateItemView(item, i);
+      const item = items[i];
+      const itemView = onCreateItemView(item, i);
       itemViews.push(itemView);
     }
-    view.addViewList(itemViews);
+    view.addChildViewList(itemViews);
     
-    super(style, view, width, height);
+    super(attrs, view, width, height);
 
     this.itemViews = itemViews;
     if(typeof width == "number" && width != -1) {

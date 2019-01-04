@@ -91,11 +91,11 @@ export default class ResLoader {
                 const total = this.assetList.length;
 
                 for (const fileItem of this.assetList) {
-                  const cache = await this._syncLocalFile(fileItem.filename, fileItem.md5);
+                  const cache = await this._syncLocalFile(fileItem.file, fileItem.md5);
 
                   if (typeof this.onSyncProgress === 'function') {
                     this.onSyncProgress({
-                      filename: fileItem.filename,
+                      filename: fileItem.file,
                       md5: fileItem.md5,
                       cache: cache
                     }, ++progress / total);
@@ -209,7 +209,7 @@ export default class ResLoader {
     if(data && texture) {
       return PIXI.extras.BitmapText.registerFont(data, texture);
     }
-
+    
     return false;
   }
 

@@ -1,56 +1,41 @@
 import * as PIXI from "pixi.js";
+import SYSTEM from '../../core/system';
 
 import View from "./view";
 
 export default class ImageView extends View {
-  constructor(style, resId) {
-    super(style);
-
-    this.resId = resId;
-
-    this.render();
+  onParseArgs(args) {
+    this.resId = SYSTEM.resId(args[0]);
   }
 
-  render() {
-    this.removeChildren();
-
-    this._renderImage();
-
-    this._layout();
-    this._renderBackground();
+  onParseAttrs(attrs) {
+    super._setAttrs(this, attrs, View.ATTR_TEXTURE, this.selector, 'imageStyle');
   }
 
-  _renderImage() {
-    this.imageView = new PIXI.Sprite(PIXI.Texture.fromFrame(this.resId));
-
-    let imageStyle = this.style['imageStyle' + this.state];
-    this._setProperties(this.imageView, imageStyle, 'width', 'height', 'tint', 'alpha');
+  onInit() {
+    this.imageView = new PIXI.Sprite(PIXI.Texture.from(this.resId));
     this.addChild(this.imageView);
   }
 
-  _layout() {
-    this._updateLayoutParameters();
-    this._adjustAlignParameters();
+  onRender() {
+    if(typeof this.imageStyle.resId != 'undefined' && this.resId != this.imageStyle.resId) {
+      this.resId = this.imageStyle.resId;
+      this.imageView.texture = PIXI.Texture.from(this.resId);
+    }
 
-    let x = this.alignOffsetX + this.padding.left;
-    let y = this.alignOffsetY + this.padding.top;
-
-    this.imageView.x = x;
-    this.imageView.y = y;
+    super._setAttrs(this.imageView, this.imageStyle, View.ATTR_SIZE, '', 'width', 'height', 'padding');
+    super._setAttrs(this.imageView, this.imageStyle, View.ATTR_VALUE, '', 'tint', 'alpha');
   }
 
-  _updateLayoutParameters() {
-    this.viewWidth = this.padding.left + this.imageView.width + this.padding.right;
-    this.viewHeight = this.padding.top + this.imageView.height +  this.padding.bottom;
+  onMeasure() {
+    const viewWidth = this.padding.left + this.imageView.width + this.padding.right;
+    const viewHeight = this.padding.top + this.imageView.height + this.padding.bottom;
 
-    if (this.layoutWidth == -1) {
-      this.layoutWidth = this.viewWidth;
-    }
+    return [viewWidth, viewHeight];
+  }
 
-    if (this.layoutHeight == -1) {
-      this.layoutHeight = this.viewHeight;
-    }
-
-    this.hitArea = new PIXI.Rectangle(0, 0, this.layoutWidth, this.layoutHeight);
+  onLayout() { 
+    this.imageView.x = this.alignOffsetX + this.padding.left;
+    this.imageView.y = this.alignOffsetY + this.padding.top;
   }
 }

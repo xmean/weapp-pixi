@@ -7,6 +7,7 @@ import ResLoader from './loader/loader';
 import UI from './ui/index';
 
 import Prebuild from './model/prebuild';
+import ModelPool from './model/pool';
 
 import DrawUtils from './utils/drawutils';
 import MathUtils from './utils/mathutils';
@@ -20,6 +21,7 @@ WPX.UI = UI;
 WPX.Tween = Tween;
 
 WPX.Prebuild = Prebuild;
+WPX.ModelPool = ModelPool;
 
 WPX.DrawUtils = DrawUtils;
 WPX.MathUtils = MathUtils;

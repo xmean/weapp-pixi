@@ -35,6 +35,7 @@ export default class WPX {
     // pages
 
     this.pages = [];
+    this.backStack = [];
   }
 
   loop() {
@@ -82,11 +83,25 @@ export default class WPX {
     if(typeof onPageTransition === 'function') {
       onPageTransition(this.currentPage, currentPage, () => {
         this.currentPage = currentPage;
+        this.backStack.push(id);
         this.currentPage.resume();
       });
     } else {
       this.currentPage = currentPage;
+      this.backStack.push(id);
       this.currentPage.resume();
     }
+  }
+
+  back() {
+    this.backStack.pop();
+    const id = this.backStack.pop();
+    if(typeof id != 'undefined') {
+      this.setPage(id);
+    }
+  }
+
+  hasPage(id) {
+    return (typeof id === 'string') && (id in this.pages);
   }
 }

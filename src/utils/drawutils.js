@@ -34,8 +34,8 @@ export default class DrawUtils {
     }
   }
 
-  static loadAnimatedSprite(textureId) {
-    let parts = textureId.split('.');
+  static loadAnimatedSprite(resId) {
+    let parts = resId.split('.');
     let base = parts.slice(0, -1).join('.');
     let ext = parts.slice(-1);
 
@@ -47,20 +47,6 @@ export default class DrawUtils {
 
       i++;
       frameId = base + '##' + i + "." + ext;
-    }
-
-    return new PIXI.extras.AnimatedSprite(frames);
-  }
-
-  static loadAnimation(resId) {
-    let frames = [];
-    let i = 0;
-    let frameId = resId + '$$' + i;
-    while(frameId in PIXI.utils.TextureCache) {
-      frames.push(PIXI.Texture.fromFrame(frameId));
-      
-      i++;
-      frameId = resId + '$$' + i;
     }
 
     return new PIXI.extras.AnimatedSprite(frames);

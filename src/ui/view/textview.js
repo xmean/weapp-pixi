@@ -1,26 +1,14 @@
 import * as PIXI from "pixi.js";
 
 import View from "./view";
-import ViewError from "./viewerror";
 
 export default class TextView extends View {
-  _parseIconAttrs(attr) {
-    if(typeof attr.resId === 'undefined') {
-      throw new ViewError('the `resId` of `iconAttr` can not be null');
-    }
-
-    this._setAttrs(attr, attr, View.ATTR_TEXTURE, '', 'resId');
-    this._setAttrs(attr, attr, View.ATTR_SIZE, '', 'width', 'height', 'padding');
-
-    return attr;
-  }
-
   onParseAttrs(attrs) {
-    this._setAttrs(this, attrs, View.ATTR_TEXTSTYLE, this.selector, 'textStyle');
-    this._setAttrs(this, attrs, this._parseIconAttrs, this.selector, 'iconTop');
-    this._setAttrs(this, attrs, this._parseIconAttrs, this.selector, 'iconLeft');
-    this._setAttrs(this, attrs, this._parseIconAttrs, this.selector, 'iconBottom');
-    this._setAttrs(this, attrs, this._parseIconAttrs, this.selector, 'iconRight');
+    super._setAttrs(this, attrs, View.ATTR_TEXTSTYLE, this.selector, 'textStyle');
+    super._setAttrs(this, attrs, View.ATTR_TEXTURE, this.selector, 'iconTop');
+    super._setAttrs(this, attrs, View.ATTR_TEXTURE, this.selector, 'iconLeft');
+    super._setAttrs(this, attrs, View.ATTR_TEXTURE, this.selector, 'iconBottom');
+    super._setAttrs(this, attrs, View.ATTR_TEXTURE, this.selector, 'iconRight');
   }
 
   onParseArgs(args) {
@@ -29,7 +17,7 @@ export default class TextView extends View {
 
   onInit() {
     this.textView = new PIXI.Text(this.text, this.textStyle);
-    this._setAttrs(this.textView, this.textStyle, View.ATTR_VALUE, '', 'alpha');
+    super._setAttrs(this.textView, this.textStyle, View.ATTR_VALUE, '', 'alpha');
     this.addChild(this.textView);
   }
 
@@ -42,7 +30,7 @@ export default class TextView extends View {
       this.textView.style = this.textStyle;
     }
 
-    this._setAttrs(this.textView, this.textStyle, View.ATTR_VALUE, 'alpha');
+    super._setAttrs(this.textView, this.textStyle, View.ATTR_VALUE, 'alpha');
   }
 
   _renderIcons() {
@@ -64,8 +52,8 @@ export default class TextView extends View {
     }
 
     this[iconView] = new PIXI.Sprite(PIXI.Texture.fromFrame(iconStyle.resId));
-    this._setAttrs(this[iconView], iconStyle, View.ATTR_SIZE, '', 'width', 'height', 'padding');
-    this._setAttrs(this[iconView], iconStyle, View.ATTR_VALUE, '', 'tint', 'alpha');
+    super._setAttrs(this[iconView], iconStyle, View.ATTR_SIZE, '', 'width', 'height', 'padding');
+    super._setAttrs(this[iconView], iconStyle, View.ATTR_VALUE, '', 'tint', 'alpha');
 
     this.addChild(this[iconView]);
   }

@@ -25,7 +25,7 @@ export default class Tween {
   }
 
   reset() {
-    this.ticker = 0;
+    this.tick = 0;
     this.repeatCounter = 0;
     this.enabled = false;
   }
@@ -43,9 +43,9 @@ export default class Tween {
       return;
     }
 
-    this.ticker++;
-    if (this.ticker > this.duration) {
-      this.ticker = 0;
+    this.tick++;
+    if (this.tick > this.duration) {
+      this.tick = 0;
 
       if(typeof this.repeat == 'number') {
         this.repeatCounter++;
@@ -70,8 +70,8 @@ export default class Tween {
     }
     
     if(typeof this.onUpdate == 'function') {
-      let t = this.ticker / this.duration;
-      let v = Easing[this.easing](t) * (this.rangeValue) + this.startValue;
+      const t = this.tick / this.duration;
+      const v = Easing[this.easing](t) * this.rangeValue + this.startValue;
       this.onUpdate(v);
     }
   }

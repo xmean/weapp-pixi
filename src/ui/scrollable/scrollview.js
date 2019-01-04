@@ -4,22 +4,25 @@ import Tween from "../../tween/tween";
 import View from "../view/view";
 
 export default class ScrollView extends View {
-  constructor(style, view, viewportWidth, viewportHeight) {
-    super(style);
+  onParseArgs(args) {
+    this.view = args[0];
+    this.viewportWidth = args[1];
+    this.viewportHeight = args[2];
+  }
 
-    this.view = view;
+  onInit() {
     this.addChild(this.view);
 
     this.scrollBounds = { left: 0, right: 0, top: 0, bottom: 0 };
 
     this.viewportMask = new PIXI.Graphics();
     this.addChild(this.viewportMask);
-    this.setViewportSize(viewportWidth, viewportHeight);
+    this._setViewportSize(this.viewportWidth, this.viewportHeight);
 
     this.horizontalScrollEnabled = false;
     this.verticalScrollEnabled = false;
 
-    this.setupScroll();
+    this._setupScroll();
 
     this.flingTweenX = {
       enabled : false,
@@ -27,7 +30,7 @@ export default class ScrollView extends View {
       resistance: 0.5,
       onFling: (v) => {
         this.view.x += v;
-        this.reboundX();
+        this._reboundX();
       }
     };
     this.flingTweenY = {
@@ -36,7 +39,7 @@ export default class ScrollView extends View {
       resistance: 0.5,
       onFling: (v) => {
         this.view.y += v;
-        this.reboundY();
+        this._reboundY();
       }
     };
     this.reboundTweenX = new Tween({ easing: "easeOutQuad", repeat: false, duration: 30 }, this.view.x, this.view.x, (v) => {
@@ -47,7 +50,11 @@ export default class ScrollView extends View {
     });
   }
 
-  setViewportSize(width, height) {
+  onMeasure() {
+    return [this.viewportWidth, this.viewportHeight];
+  }
+
+  _setViewportSize(width, height) {
     if (typeof width == 'number' && width > 0) {
       this.viewportWidth = width;
     } else {
@@ -60,13 +67,13 @@ export default class ScrollView extends View {
       this.viewportHeight = this.view.layoutHeight;
     }
 
-    this.updateViewport();
-    this.updateScrollBounds();
-    this.updateLayoutParameters();
+    this._updateViewport();
+    this._updateScrollBounds();
+    this._updateLayoutParameters();
     this.hitArea = new PIXI.Rectangle(0, 0, this.viewportWidth, this.viewportHeight);
   }
 
-  updateViewport() {
+  _updateViewport() {
     this.viewportMask.clear();
     this.viewportMask.lineStyle(0);
     this.viewportMask.beginFill(0xFFFFFF, 1);
@@ -75,14 +82,14 @@ export default class ScrollView extends View {
     this.mask = this.viewportMask;
   }
 
-  updateScrollBounds() {
+  _updateScrollBounds() {
     this.scrollBounds.left = -(this.view.layoutWidth - this.viewportWidth);
     this.scrollBounds.right = 0;
     this.scrollBounds.top = -(this.view.layoutHeight - this.viewportHeight);
     this.scrollBounds.bottom = 0;
   }
 
-  updateLayoutParameters() {
+  _updateLayoutParameters() {
     this.layoutWidth = this.padding.left + this.viewportWidth + this.padding.right;
     this.layoutHeight = this.padding.top + this.viewportHeight + this.padding.bottom;
   }
@@ -97,17 +104,17 @@ export default class ScrollView extends View {
     this.interactive = true;
   }
 
-  setupScroll() {
+  _setupScroll() {
     this.dragging = false;
     this.dragPoint = {x: 0, y: 0};
 
-    this.pointerdown = this.onDragStart;
-    this.pointermove = this.onDragMove;
-    this.pointerup = this.onDragEnd;
-    this.pointerupoutside = this.onDragEnd;
+    this.pointerdown = this._onDragStart;
+    this.pointermove = this._onDragMove;
+    this.pointerup = this._onDragEnd;
+    this.pointerupoutside = this._onDragEnd;
   }
 
-  onDragStart(event) {
+  _onDragStart(event) {
     if (!this.horizontalScrollEnabled && !this.verticalScrollEnabled) {
       return;
     }
@@ -124,7 +131,7 @@ export default class ScrollView extends View {
     this.reboundTweenY.enabled = false;
   }
 
-  onDragMove(event) {
+  _onDragMove(event) {
     if (!this.horizontalScrollEnabled && !this.verticalScrollEnabled) {
       return;
     }
@@ -148,19 +155,19 @@ export default class ScrollView extends View {
     }
   }
 
-  onDragEnd() {
+  _onDragEnd() {
     if (!this.horizontalScrollEnabled && !this.verticalScrollEnabled) {
       return;
     }
 
     if (this.horizontalScrollEnabled) {
-      if(!this.reboundX()) {
+      if(!this._reboundX()) {
         this.flingTweenX.enabled = true;
       }
     }
 
     if (this.verticalScrollEnabled) {
-      if(!this.reboundY()) {
+      if(!this._reboundY()) {
         this.flingTweenY.enabled = true;
       }
     }
@@ -168,7 +175,7 @@ export default class ScrollView extends View {
     this.dragging = false;
   }
 
-  fling(tween) {
+  _fling(tween) {
     if(tween.enabled) {
       let sign = Math.sign(tween.velocity);
       tween.velocity -= sign * tween.resistance;
@@ -182,7 +189,7 @@ export default class ScrollView extends View {
     }
   }
 
-  reboundX() {
+  _reboundX() {
     if (this.view.x < this.scrollBounds.left) {
       this.flingTweenX.enabled = false;
       this.reboundTweenX.setRange(this.view.x, this.scrollBounds.left);
@@ -200,7 +207,7 @@ export default class ScrollView extends View {
     return false;
   }
 
-  reboundY() {
+  _reboundY() {
     if (this.view.y < this.scrollBounds.top) {
       this.flingTweenY.enabled = false;
       this.reboundTweenY.setRange(this.view.y, this.scrollBounds.top);
@@ -221,8 +228,8 @@ export default class ScrollView extends View {
   update() {
     this.view.update();
     
-    this.fling(this.flingTweenX);
-    this.fling(this.flingTweenY);
+    this._fling(this.flingTweenX);
+    this._fling(this.flingTweenY);
     this.reboundTweenX.update();
     this.reboundTweenY.update();
   }
