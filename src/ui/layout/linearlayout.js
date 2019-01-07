@@ -33,10 +33,13 @@ export default class LinearLayout extends ViewGroup {
     const x =  this.alignOffsetX + this.padding.left;
     let y =  this.alignOffsetY + this.padding.top;
 
+    let alignOffsetX = 0;
+    let alignOffsetY = 0;
     for (const view of this.childViews) {
-      y += view.margin.top;
+      [alignOffsetX, alignOffsetY] = super.getChildViewAlignParameter(view);
+      y += (alignOffsetY + view.margin.top);
       
-      view.x = x;
+      view.x = x + alignOffsetX;
       view.y = y;
 
       y += (view.layoutHeight + view.margin.bottom);
@@ -47,11 +50,14 @@ export default class LinearLayout extends ViewGroup {
     let x = this.alignOffsetX + this.padding.left;
     const y = this.alignOffsetY + this.padding.top;
 
+    let alignOffsetX = 0;
+    let alignOffsetY = 0;
     for (const view of this.childViews) {
-      x += view.margin.left;
+      [alignOffsetX, alignOffsetY] = super.getChildViewAlignParameter(view);
+      x += (alignOffsetX + view.margin.left);
 
       view.x = x;
-      view.y = y;
+      view.y = y + alignOffsetY;
 
       x += (view.layoutWidth + view.margin.right);
     }

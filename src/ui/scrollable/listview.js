@@ -44,4 +44,12 @@ export default class ListView extends ScrollView {
       this.enableVerticalScroll();
     }
   }
+
+  updateItemData(items) {
+    for (let i = 0; i < items.length; i++) {
+      if(typeof this.itemViews[i] != 'undefined') {
+        this.itemViews[i].updateItem(items[i], i);
+      }
+    }
+  }
 }

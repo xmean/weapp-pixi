@@ -40,16 +40,20 @@ export default class View extends PIXI.Container {
     this.layoutHeight = 0;
 
     this.align = View.ALIGN_TOP | View.ALIGN_LEFT;
-    this.selector = "";
-
+    
     this.viewWidth = 0;
     this.viewHeight = 0;
     this.alignOffsetX = 0;
     this.alignOffsetY = 0;
 
     this.attrs = attrs;
-    this._parseAttrs(attrs);
+    this.selector = "";
+    if(typeof this.attrs.selector === 'string') {
+      this.selector = this.attrs.selector;
+    }
+
     this._parseArgs(args);
+    this._parseAttrs(attrs);
     this._init();
     this._render();
   }
@@ -176,7 +180,6 @@ export default class View extends PIXI.Container {
     this._setAttrs(this, attrs, View.ATTR_RECT, this.selector, 'margin', 'padding');
     this._setAttrs(this, attrs, View.ATTR_ALIGN, this.selector, 'align');
     this._setAttrs(this, attrs, View.ATTR_SIZE, this.selector, 'layoutWidth', 'layoutHeight');
-    this._setAttrs(this, attrs, View.ATTR_VALUE, '', 'selector');
 
     if(typeof this.onParseAttrs === 'function') {
       this.onParseAttrs(attrs);
@@ -335,7 +338,7 @@ export default class View extends PIXI.Container {
   setSelector(selector) {
     if (this.selector != selector) {
       this.selector = selector;
-      
+
       this._updateAttrs();
       this._render();
     }

@@ -5,6 +5,10 @@ import View from "./view";
 export default class TextView extends View {
   onParseAttrs(attrs) {
     super._setAttrs(this, attrs, View.ATTR_TEXTSTYLE, this.selector, 'textStyle');
+    if(typeof this.textStyle != 'undefined' && typeof this.textStyle.text != 'undefined') {
+      this.text = this.textStyle.text;
+    }
+    
     super._setAttrs(this, attrs, View.ATTR_TEXTURE, this.selector, 'iconTop');
     super._setAttrs(this, attrs, View.ATTR_TEXTURE, this.selector, 'iconLeft');
     super._setAttrs(this, attrs, View.ATTR_TEXTURE, this.selector, 'iconBottom');
@@ -34,28 +38,35 @@ export default class TextView extends View {
   }
 
   _renderIcons() {
+    ['Top', 'Left', 'Bottom', 'Right'].map(v => this._removeIcon(v));
     ['Top', 'Left', 'Bottom', 'Right'].map(v => this._renderIcon(v));
   }
 
   _renderIcon(id) {
     const iconStyle = this['icon' + id];
-
-    if(typeof iconStyle === 'undefined') {
+    if(typeof iconStyle === 'undefined' || iconStyle === null) {
       return;
     }
-
+    
     const iconView = 'iconView' + id;
-
-    if(this[iconView] instanceof PIXI.Sprite) {
-      this.removeChild(this[iconView]);
-      this[iconView].destroy();
-    }
-
     this[iconView] = new PIXI.Sprite(PIXI.Texture.fromFrame(iconStyle.resId));
     super._setAttrs(this[iconView], iconStyle, View.ATTR_SIZE, '', 'width', 'height', 'padding');
     super._setAttrs(this[iconView], iconStyle, View.ATTR_VALUE, '', 'tint', 'alpha');
 
     this.addChild(this[iconView]);
+  }
+
+  _removeIcon(id) {
+    const iconView = 'iconView' + id;
+
+    if(typeof this[iconView] != 'undefined') {
+      if(this[iconView] instanceof PIXI.Sprite) {
+        this.removeChild(this[iconView]);
+        this[iconView].destroy();
+      }
+
+      delete this[iconView];
+    }
   }
 
   onRender() {
@@ -116,7 +127,7 @@ export default class TextView extends View {
     if (this.text != text) {
       this.text = text;
       
-      this._render();
+      this.invalidate();
     }
   }
 }
