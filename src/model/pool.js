@@ -38,4 +38,14 @@ export default class ModelPool {
       }
     }
   }
+
+  finishAll() {
+    while(this.models.length > 0) {
+      const model = this.models.pop();
+      if(typeof this.onFinish === 'function') {
+        this.onFinish(model);
+      }
+      this.pool.push(model); 
+    }
+  }
 }

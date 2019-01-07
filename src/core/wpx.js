@@ -93,6 +93,16 @@ export default class WPX {
     }
   }
 
+  getPage(id) {
+    return this.pages[id];
+  }
+
+  renderPage(page) {
+    if(page instanceof Page) {
+      this.renderer.render(page);
+    }
+  }
+
   back() {
     this.backStack.pop();
     const id = this.backStack.pop();
