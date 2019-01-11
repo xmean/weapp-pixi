@@ -38,6 +38,14 @@ export default class Tween {
     this.enabled = false;
   }
 
+  pause() {
+    this.enabled = false;
+  }
+
+  resume() {
+    this.enabled = true;
+  }
+
   update() { 
     if (!this.enabled) {
       return;

@@ -46,6 +46,8 @@ export default class View extends PIXI.Container {
     this.alignOffsetX = 0;
     this.alignOffsetY = 0;
 
+    this.showBackground = true;
+
     this.attrs = attrs;
     this.selector = "";
     if(typeof this.attrs.selector === 'string') {
@@ -180,6 +182,7 @@ export default class View extends PIXI.Container {
     this._setAttrs(this, attrs, View.ATTR_RECT, this.selector, 'margin', 'padding');
     this._setAttrs(this, attrs, View.ATTR_ALIGN, this.selector, 'align');
     this._setAttrs(this, attrs, View.ATTR_SIZE, this.selector, 'layoutWidth', 'layoutHeight');
+    this._setAttrs(this, attrs, View.ATTR_VALUE, this.selector, 'showBackground');
 
     if(typeof this.onParseAttrs === 'function') {
       this.onParseAttrs(attrs);
@@ -262,44 +265,14 @@ export default class View extends PIXI.Container {
   }
 
   _renderBackground() {
-    // let backgroundStyle = this.style['backgroundStyle' + this.state];
-    // if (typeof backgroundStyle == 'undefined') {
-    //   delete this.backgroundView;
-    //   return;
-    // }
+    if(typeof this.backgroundView != 'undefined') {
+      this.removeChild(this.backgroundView);
+      delete this.backgroundView;
+    }
 
-    // this.removeChild(this.backgroundView);
-    // delete this.backgroundView;
-    
-    // if (backgroundStyle.backgroundType == 'circle') {
-    //   let r = Math.min(this.layoutWidth, this.layoutHeight) / 2;
-
-    //   this.backgroundView = new PIXI.Graphics();
-    //   this.backgroundView.lineStyle(backgroundStyle.borderWidth, backgroundStyle.borderColor, backgroundStyle.borderAlpha);
-    //   this.backgroundView.beginFill(backgroundStyle.fillColor, backgroundStyle.fillAlpha);
-    //   this.backgroundView.drawCircle(r, r, r);
-    //   this.backgroundView.endFill();
-    //   this.addChildAt(this.backgroundView, 0);
-    // } else if(backgroundStyle.backgroundType == 'roundedRect') {
-    //   let cornerRadius = backgroundStyle.cornerRadius;
-    //   if(cornerRadius > 0 && cornerRadius < 1) {
-    //     cornerRadius = cornerRadius * Math.min(this.layoutWidth, this.layoutHeight);
-    //   }
-
-    //   this.backgroundView = new PIXI.Graphics();
-    //   this.backgroundView.lineStyle(backgroundStyle.borderWidth, backgroundStyle.borderColor, backgroundStyle.borderAlpha);
-    //   this.backgroundView.beginFill(backgroundStyle.fillColor, backgroundStyle.fillAlpha);
-    //   this.backgroundView.drawRoundedRect(0, 0, this.layoutWidth, this.layoutHeight, cornerRadius);
-    //   this.backgroundView.endFill();
-    //   this.addChildAt(this.backgroundView, 0);
-    // } else if(backgroundStyle.backgroundType == 'rect') {
-    //   this.backgroundView = new PIXI.Graphics();
-    //   this.backgroundView.lineStyle(backgroundStyle.borderWidth, backgroundStyle.borderColor, backgroundStyle.borderAlpha);
-    //   this.backgroundView.beginFill(backgroundStyle.fillColor, backgroundStyle.fillAlpha);
-    //   this.backgroundView.drawRect(0, 0, this.layoutWidth, this.layoutHeight);
-    //   this.backgroundView.endFill();
-    //   this.addChildAt(this.backgroundView, 0);
-    // }
+    if(this.showBackground && (typeof this.onRenderBackground === 'function')) {
+      this.onRenderBackground(this.layoutWidth, this.layoutHeight, this.viewWidth, this.viewHeight);
+    }
   }
 
   _render() {
@@ -324,7 +297,7 @@ export default class View extends PIXI.Container {
   update() {
     
   }
-
+  
   setOnClick(onClick) {
     if(typeof onClick == 'function') {
       this.interactive = true;
