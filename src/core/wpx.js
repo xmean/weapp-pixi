@@ -18,7 +18,9 @@ export default class WPX {
       view: this.view,
       resolution: this.resolution,
       antialias: true,
-      forceWebGL: false
+      forceWebGL: false,
+      fps: 60,
+      lag: 240
     }
 
     if (typeof options === 'object') {
@@ -31,6 +33,9 @@ export default class WPX {
       this.renderer = PIXI.autoDetectRenderer(rendererOptions);
     }
     SYSTEM.renderer = this.renderer;
+    this.fps = rendererOptions.fps;
+    this.frameTime = 1000 / this.fps;
+    this.lag = rendererOptions.lag;
 
     // pages
 
@@ -42,14 +47,33 @@ export default class WPX {
     if (!(this.currentPage instanceof Page) || this.currentPage.isPaused()) {
       return;
     }
-    this.currentPage.update();
-    this.renderer.render(this.currentPage);
+    const currentFrameTime = Date.now();
+    this.deltaTime += (currentFrameTime - this.lastFrameTime);
+    this.lastFrameTime = currentFrameTime;	
+    
+    let updateCount = 0;
+    while(this.deltaTime >= this.frameTime) {
+      this.currentPage.update(this.frameTime);
+      this.deltaTime -= this.frameTime;
 
-    requestAnimationFrame(() => { this.loop(); });
+      updateCount++;
+      if(updateCount >= this.lag) {
+        this.deltaTime = 0;
+        if(typeof this.onLag != 'undefined') {
+          this.onLag(updateCount);
+        }
+        break;
+      }
+    }
+
+    this.renderer.render(this.currentPage);
+    requestAnimationFrame(() => this.loop());
   }
 
   start() {
-    this.loop();
+    this.lastFrameTime = Date.now();
+    this.deltaTime = 0;
+    requestAnimationFrame(() => this.loop());
   }
 
   addPage(id, page) {

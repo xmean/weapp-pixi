@@ -65,7 +65,7 @@ class System {
     return id;
   }
 
-  createOffScreenCanvas() {
+  createCanvas() {
     return wx.createCanvas();
   }
 }
