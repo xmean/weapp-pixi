@@ -90,8 +90,8 @@ export default class TextView extends View {
   }
 
   onLayout() {
-    let x = this.alignOffsetX + this.padding.left;
-    let y = this.alignOffsetY + this.padding.top + (typeof this.iconViewTop != 'undefined' ? (this.iconViewTop.height + this.iconViewTop.padding) : 0);
+    let x = this.alignOffsetX;
+    let y = this.alignOffsetY + (typeof this.iconViewTop != 'undefined' ? (this.iconViewTop.height + this.iconViewTop.padding) : 0);
     let height = Math.max(
       this.textView.height, 
       typeof this.iconViewLeft === 'undefined' ?  0 : this.iconViewLeft.height, 

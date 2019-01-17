@@ -5,7 +5,9 @@ import View from "./view";
 
 export default class ImageView extends View {
   onParseArgs(args) {
-    this.resId = SYSTEM.resId(args[0]);
+    if(typeof args[0] != 'undefined') {
+      this.resId = SYSTEM.resId(args[0]);
+    }
   }
 
   onParseAttrs(attrs) {
@@ -13,14 +15,22 @@ export default class ImageView extends View {
   }
 
   onInit() {
-    this.imageView = new PIXI.Sprite(PIXI.Texture.from(this.resId));
-    this.addChild(this.imageView);
+    if(typeof this.resId != 'undefined') {
+      this.imageView = new PIXI.Sprite(PIXI.Texture.from(this.resId));
+      this.addChild(this.imageView);
+    }
   }
 
   onRender() {
     if(typeof this.imageStyle.resId != 'undefined' && this.resId != this.imageStyle.resId) {
       this.resId = this.imageStyle.resId;
-      this.imageView.texture = PIXI.Texture.from(this.resId);
+      
+      if(typeof this.imageView === 'undefined') {
+        this.imageView = new PIXI.Sprite(PIXI.Texture.from(this.resId));
+        this.addChild(this.imageView);
+      } else {
+        this.imageView.texture = PIXI.Texture.from(this.resId);
+      }
     }
 
     super._setAttrs(this.imageView, this.imageStyle, View.ATTR_SIZE, '', 'width', 'height', 'padding');
@@ -35,7 +45,7 @@ export default class ImageView extends View {
   }
 
   onLayout() { 
-    this.imageView.x = this.alignOffsetX + this.padding.left;
-    this.imageView.y = this.alignOffsetY + this.padding.top;
+    this.imageView.x = this.alignOffsetX;
+    this.imageView.y = this.alignOffsetY;
   }
 }

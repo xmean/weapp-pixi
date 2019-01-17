@@ -44,30 +44,34 @@ export default class ViewGroup extends View {
   }
 
   getChildViewAlignParameter(view) {
-    let alignOffsetX = 0;
-    let alignOffsetY = 0;
+    const contentWidth = this.layoutWidth - this.padding.left - this.padding.right;
+    const contentHeight = this.layoutHeight - this.padding.top - this.padding.bottom;
+
+    let alignOffsetX = this.padding.left;
+    let alignOffsetY = this.padding.top;
+    
     if (this.align & View.ALIGN_LEFT) {
-      alignOffsetX = 0;
+      alignOffsetX = this.padding.left;
     }
 
     if (this.align & View.ALIGN_CENTER) {
-      alignOffsetX = (this.layoutWidth - view.layoutWidth) / 2;
+      alignOffsetX = this.padding.left + (contentWidth - view.layoutWidth) / 2;
     }
 
     if (this.align & View.ALIGN_RIGHT) {
-      alignOffsetX = this.layoutWidth - view.layoutWidth;
+      alignOffsetX = this.layoutWidth - view.layoutWidth - this.padding.right;
     }
 
-    if (this.algin & View.ALIGN_TOP) {
-      alignOffsetY = 0;
+    if (this.align & View.ALIGN_TOP) {
+      alignOffsetY = this.padding.top;
     }
 
     if (this.align & View.ALIGN_MIDDLE) {
-      alignOffsetY = (this.layoutHeight - view.layoutHeight) / 2;
+      alignOffsetY = this.padding.top + (contentHeight - view.layoutHeight) / 2;
     }
 
     if (this.align & View.ALIGN_BOTTOM) {
-      alignOffsetY = this.layoutHeight - view.layoutHeight;
+      alignOffsetY = this.layoutHeight - view.layoutHeight - this.padding.bottom;
     }
 
     return [alignOffsetX, alignOffsetY];

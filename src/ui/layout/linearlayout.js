@@ -30,16 +30,13 @@ export default class LinearLayout extends ViewGroup {
   }
 
   _layoutVertical() {
-    const x =  this.alignOffsetX + this.padding.left;
-    let y =  this.alignOffsetY + this.padding.top;
+    let y = this.alignOffsetY;
 
-    let alignOffsetX = 0;
-    let alignOffsetY = 0;
     for (const view of this.childViews) {
-      [alignOffsetX, alignOffsetY] = super.getChildViewAlignParameter(view);
-      y += (alignOffsetY + view.margin.top);
+      const alignOffsetX = super.getChildViewAlignParameter(view)[0];
+      y += view.margin.top;
       
-      view.x = x + alignOffsetX;
+      view.x = alignOffsetX;
       view.y = y;
 
       y += (view.layoutHeight + view.margin.bottom);
@@ -47,24 +44,21 @@ export default class LinearLayout extends ViewGroup {
   }
 
   _layoutHorizontal() {
-    let x = this.alignOffsetX + this.padding.left;
-    const y = this.alignOffsetY + this.padding.top;
-
-    let alignOffsetX = 0;
-    let alignOffsetY = 0;
+    let x = this.alignOffsetX;
+    
     for (const view of this.childViews) {
-      [alignOffsetX, alignOffsetY] = super.getChildViewAlignParameter(view);
-      x += (alignOffsetX + view.margin.left);
+      const alignOffsetY = super.getChildViewAlignParameter(view)[1];
+      x += view.margin.left;
 
       view.x = x;
-      view.y = y + alignOffsetY;
+      view.y = alignOffsetY;
 
       x += (view.layoutWidth + view.margin.right);
     }
   }
 
   onMeasure() {
-    if(this.direction == LinearLayout.LAYOUT_VERTICAL) {
+    if(this.direction === LinearLayout.LAYOUT_VERTICAL) {
       let maxWidth = 0;
       let viewWidth = 0;
       let viewHeight = 0;
@@ -81,7 +75,7 @@ export default class LinearLayout extends ViewGroup {
         this.padding.left + maxWidth + this.padding.right, 
         this.padding.top + viewHeight + this.padding.bottom
       ];
-    } else if(this.direction == LinearLayout.LAYOUT_HORIZONTAL) {
+    } else if(this.direction === LinearLayout.LAYOUT_HORIZONTAL) {
       let maxHeight = 0;
       let viewWidth = 0;
       let viewHeight = 0;

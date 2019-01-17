@@ -2,12 +2,12 @@ import SYSTEM from "../../core/system";
 import * as PIXI from 'pixi.js';
 
 export default class View extends PIXI.Container {
-  static ALIGN_LEFT = 0x00;
-  static ALIGN_CENTER = 0x01;
-  static ALIGN_RIGHT = 0x02;
-  static ALIGN_TOP = 0x04;
-  static ALIGN_MIDDLE = 0x08;
-  static ALIGN_BOTTOM = 0x10;
+  static ALIGN_LEFT = 0x01;
+  static ALIGN_CENTER = 0x02;
+  static ALIGN_RIGHT = 0x04;
+  static ALIGN_TOP = 0x08;
+  static ALIGN_MIDDLE = 0x10;
+  static ALIGN_BOTTOM = 0x20;
   static ALIGN_MAP = {
     'left' : View.ALIGN_LEFT,
     'center': View.ALIGN_CENTER,
@@ -223,28 +223,31 @@ export default class View extends PIXI.Container {
   }
 
   _align() {
+    this.alignOffsetX = this.padding.left;
+    this.alignOffsetY = this.padding.top;
+
     if (this.align & View.ALIGN_LEFT) {
-      this.alignOffsetX = 0;
+      this.alignOffsetX = this.padding.left;
     }
 
     if (this.align & View.ALIGN_CENTER) {
-      this.alignOffsetX = (this.layoutWidth - this.viewWidth) / 2;
+      this.alignOffsetX = (this.layoutWidth - this.viewWidth) / 2 + this.padding.left;
     }
 
     if (this.align & View.ALIGN_RIGHT) {
-      this.alignOffsetX = this.layoutWidth - this.viewWidth;
+      this.alignOffsetX = this.layoutWidth - this.viewWidth - this.padding.right;
     }
 
-    if (this.algin & View.ALIGN_TOP) {
-      this.alignOffsetY = 0;
+    if (this.align & View.ALIGN_TOP) {
+      this.alignOffsetY = this.padding.top;
     }
 
     if (this.align & View.ALIGN_MIDDLE) {
-      this.alignOffsetY = (this.layoutHeight - this.viewHeight) / 2;
+      this.alignOffsetY = (this.layoutWidth - this.viewHeight) / 2 + this.padding.top;
     }
 
     if (this.align & View.ALIGN_BOTTOM) {
-      this.alignOffsetY = this.layoutHeight - this.viewHeight;
+      this.alignOffsetY = this.layoutHeight - this.viewHeight - this.padding.bottom;
     }
   }
 
