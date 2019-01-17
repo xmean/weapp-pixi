@@ -86,7 +86,7 @@ export default class GridLayout extends ViewGroup {
 
         x += view.margin.left;
         view.x = x;
-        view.y = y;
+        view.y = y + view.margin.top;
         this.addChild(view);
 
         x += (view.layoutWidth + view.margin.right);

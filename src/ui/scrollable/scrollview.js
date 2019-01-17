@@ -69,7 +69,6 @@ export default class ScrollView extends View {
 
     this._updateViewport();
     this._updateScrollBounds();
-    this._updateLayoutParameters();
     this.hitArea = new PIXI.Rectangle(0, 0, this.viewportWidth, this.viewportHeight);
   }
 
@@ -87,11 +86,6 @@ export default class ScrollView extends View {
     this.scrollBounds.right = 0;
     this.scrollBounds.top = -(this.view.layoutHeight - this.viewportHeight);
     this.scrollBounds.bottom = 0;
-  }
-
-  _updateLayoutParameters() {
-    this.layoutWidth = this.padding.left + this.viewportWidth + this.padding.right;
-    this.layoutHeight = this.padding.top + this.viewportHeight + this.padding.bottom;
   }
 
   enableHorizontalScroll() {

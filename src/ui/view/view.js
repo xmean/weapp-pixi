@@ -182,7 +182,7 @@ export default class View extends PIXI.Container {
     this._setAttrs(this, attrs, View.ATTR_RECT, this.selector, 'margin', 'padding');
     this._setAttrs(this, attrs, View.ATTR_ALIGN, this.selector, 'align');
     this._setAttrs(this, attrs, View.ATTR_SIZE, this.selector, 'layoutWidth', 'layoutHeight');
-    this._setAttrs(this, attrs, View.ATTR_VALUE, this.selector, 'showBackground');
+    this._setAttrs(this, attrs, View.ATTR_VALUE, this.selector, 'backgroundStyle');
 
     if(typeof this.onParseAttrs === 'function') {
       this.onParseAttrs(attrs);
@@ -273,8 +273,13 @@ export default class View extends PIXI.Container {
       delete this.backgroundView;
     }
 
-    if(this.showBackground && (typeof this.onRenderBackground === 'function')) {
-      this.onRenderBackground(this.layoutWidth, this.layoutHeight, this.viewWidth, this.viewHeight);
+    if((typeof this.onRenderBackground === 'function') && 
+      (typeof this.backgroundStyle != 'undefined') && 
+      (this.backgroundStyle != null)) {
+      this.backgroundView = this.onRenderBackground(this.layoutWidth, this.layoutHeight, this.viewWidth, this.viewHeight, this.backgroundStyle);
+      if(typeof this.backgroundView != 'undefined') {
+        this.addChildAt(this.backgroundView, 0);
+      }
     }
   }
 
