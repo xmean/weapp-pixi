@@ -9,6 +9,7 @@ import UI from './ui/index';
 import Prebuild from './model/prebuild';
 import ModelPool from './model/pool';
 
+import Utils from './utils/utils';
 import DrawUtils from './utils/drawutils';
 import MathUtils from './utils/mathutils';
 
@@ -25,6 +26,7 @@ WPX.ModelPool = ModelPool;
 
 WPX.DrawUtils = DrawUtils;
 WPX.MathUtils = MathUtils;
+WPX.Utils = Utils;
 
 // shortcut functions
 
