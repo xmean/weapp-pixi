@@ -138,9 +138,7 @@ export default class View extends PIXI.Container {
       style.height = SYSTEM.px(style.height);
     }
 
-    if(typeof style.padding != 'undefined') {
-      style.padding = SYSTEM.px(style.padding);
-    }
+    style.padding = (typeof style.padding === 'undefined' ? 0 : SYSTEM.px(style.padding));
 
     return style;
   }

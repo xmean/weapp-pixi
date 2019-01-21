@@ -4,7 +4,7 @@ export default class Easing {
   }
 
   static breath(t) {
-    return t > 0.5 ? 1 - t : t;
+    return t > 0.5 ? 2 * (1 - t) : 2 * t;
   }
 
   // Slight acceleration from zero to full speed

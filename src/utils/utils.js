@@ -3,7 +3,7 @@ export default class Utils {
     target[attr] = typeof src[attr] === 'undefined' ? defaultValue : src[attr];
   }
 
-  static setAttrs(target, src, attrs) {
+  static setAttrs(target, src, ...attrs) {
     for(const attr of attrs) {
       target[attr[0]] = typeof src[attr[0]] === 'undefined' ? attr[1] : src[attr[0]];
     }
