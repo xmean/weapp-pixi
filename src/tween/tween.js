@@ -31,11 +31,11 @@ export default class Tween {
   }
 
   _finish() {
+    this.enabled = false;
+    
     if (typeof this.onFinish != 'undefined') {
       this.onFinish();
     }
-
-    this.enabled = false;
   }
 
   pause() {

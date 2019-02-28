@@ -165,8 +165,8 @@ export default class View extends PIXI.Container {
             target[p] = {};
           }
           Object.assign(target[p], this._parseAttrTextStyle(typeof src[p + selector] != 'undefined' ? src[p + selector] : src[p]));
-        } else if(typeof type === View.ATTR_TEXTURE) {
-          target[p] = this._parseAttrTexture(typeof src[p + selector] != 'undefined' ? src[p + selector] : src[p]); 
+        } else if(type === View.ATTR_TEXTURE) {
+          target[p] = this._parseAttrTextureStyle(typeof src[p + selector] != 'undefined' ? src[p + selector] : src[p]); 
         } else if(typeof type === 'function') {
           target[p] = type(typeof src[p + selector] != 'undefined' ? src[p + selector] : src[p]);
         } else {
@@ -210,6 +210,10 @@ export default class View extends PIXI.Container {
 
     this.interactive = true;
     this.tap = (e) => {
+      if(typeof this.beforeClick === 'function') {
+        this.beforeClick();
+      }
+
       if(typeof this.onClick === 'function') {
         this.onClick(e);
       }
