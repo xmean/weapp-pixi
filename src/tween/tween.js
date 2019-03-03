@@ -31,19 +31,39 @@ export default class Tween {
   }
 
   _finish() {
+    if(typeof this.beforeFinish === 'function') {
+      this.beforeFinish();
+    }
+
     this.enabled = false;
     
-    if (typeof this.onFinish != 'undefined') {
+    if (typeof this.onFinish  === 'function') {
       this.onFinish();
+    }
+  }
+
+  start() {
+    this.enabled = true;
+
+    if(typeof this.onStart === 'function') {
+      this.onStart();
     }
   }
 
   pause() {
     this.enabled = false;
+
+    if(typeof this.onPause === 'function') {
+      this.onPause();
+    }
   }
 
   resume() {
     this.enabled = true;
+
+    if(typeof this.onResume === 'function') {
+      this.onResume();
+    }
   }
 
   update() { 
@@ -54,10 +74,13 @@ export default class Tween {
     this.tick++;
     if (this.tick > this.duration) {
       this.tick = 0;
+      this.repeatCounter++;
+
+      if(typeof this.onRepeat == 'function') {
+        this.onRepeat(this.repeatCounter);
+      }
 
       if(typeof this.repeat == 'number') {
-        this.repeatCounter++;
-
         if(this.repeatCounter >= this.repeat) {
           this._finish();
           return;
@@ -70,10 +93,6 @@ export default class Tween {
       } else {
         this._finish();
         return;
-      }
-
-      if(typeof this.onRepeat == 'function') {
-        this.onRepeat(this.repeatCounter);
       }
     }
     

@@ -7,6 +7,10 @@ export default class Easing {
     return t > 0.5 ? 2 * (1 - t) : 2 * t;
   }
 
+  static breathSin(t) {
+    return 2 * Math.sin(t * Math.PI);
+  }
+
   // Slight acceleration from zero to full speed
   static easeInSine(t) {
     return -1 * Math.cos(t * (Math.PI / 2)) + 1;
