@@ -14,6 +14,7 @@ export default class Tween {
     this.onUpdate = onUpdate;
     this.onRepeat = onRepeat;
 
+    this.enabled = false;
     this.reset();
   }
   
@@ -27,7 +28,6 @@ export default class Tween {
   reset() {
     this.tick = 0;
     this.repeatCounter = 0;
-    this.enabled = false;
   }
 
   _finish() {
@@ -43,10 +43,20 @@ export default class Tween {
   }
 
   start() {
+    this.reset();
     this.enabled = true;
 
     if(typeof this.onStart === 'function') {
       this.onStart();
+    }
+  }
+
+  stop() {
+    this.reset();
+    this.enabled = false;
+
+    if(typeof this.onStop === 'function') {
+      this.onStop();
     }
   }
 
