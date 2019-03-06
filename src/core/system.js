@@ -48,18 +48,36 @@ class System {
       throw new Error('`id` should be string texture id');
     }
 
-    let parts = id.split('.');
-    let base = parts.slice(0, -1).join('.');
-    let ext = parts.slice(-1);
-    for (let i = Math.ceil(this.resolution); i >= 2; i--) {
-      let prefix = '@' + Math.ceil(i) + 'x';
-      let resId = base + prefix + '.' + ext;
+    const r = Math.ceil(this.resolution);
+    if(r <= 1) {
+      return id;
+    }
 
-      if (!(resId in PIXI.utils.TextureCache)) {
-        continue;
-      }
-
+    const parts = id.split('.');
+    const base = parts.slice(0, -1).join('.');
+    const ext = parts.slice(-1);
+    
+    const resId = base + '@' + r + 'x' + '.' + ext;
+    if(resId in PIXI.utils.TextureCache) {
       return resId;
+    }
+
+    // find the nearest resultion resources
+
+    for(let i = 1; i <= r - 2; i++) {
+      // search for higher resolution
+
+      let hResId = base + '@' + (r + i) + 'x' + '.' + ext;
+      if(hResId in PIXI.utils.TextureCache) {
+        return hResId;
+      }
+      
+      // search for lower resolution
+
+      let lResId = base + '@' + (r - i) + 'x' + '.' + ext;
+      if(lResId in PIXI.utils.TextureCache) {
+        return lResId;
+      }
     }
 
     return id;

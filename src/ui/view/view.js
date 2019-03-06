@@ -82,7 +82,7 @@ export default class View extends PIXI.Container {
   }
 
   _parseAttrRect(spacing) {
-    if(typeof spacing != 'object') {
+    if(typeof spacing != 'object' || spacing === null) {
       return null;
     }
 
@@ -110,7 +110,7 @@ export default class View extends PIXI.Container {
   }
 
   _parseAttrTextStyle(style) {
-    if(typeof style != 'object') {
+    if(typeof style != 'object' || style === null) {
       return null;
     }
 
@@ -122,7 +122,7 @@ export default class View extends PIXI.Container {
   }
 
   _parseAttrTextureStyle(style) {
-    if(typeof style != 'object') {
+    if(typeof style != 'object' || style === null) {
       return null;
     }
 

@@ -34,4 +34,8 @@ WPX.dp = (v) => {
     return WPX.SYSTEM.dp(v);
 };
 
+WPX.resId = (id) => {
+    return WPX.SYSTEM.resId(id);
+}
+
 export default WPX;
