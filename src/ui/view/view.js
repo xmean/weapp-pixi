@@ -143,6 +143,24 @@ export default class View extends PIXI.Container {
     return style;
   }
 
+  _setImageSize(imageView, imageStyle) {
+    const _ = {width: -1, height: -1};
+    this._setAttrs(_, imageStyle, View.ATTR_SIZE, 'width', 'height');
+
+    if(_.width >= 0 && _.height >= 0) {
+      imageView.width = _.width;
+      imageView.height = _.height;
+    } else if(_.width < 0 && _.height > 0) {
+      _.width = imageView.width * _.height / imageView.height;
+      imageView.width = _.width;
+      imageView.height = _.height;
+    } else if(_.width > 0 && _.height < 0) {
+      _.height = imageView.height * _.width / imageView.width;
+      imageView.width = _.width;
+      imageView.height = _.height;
+    }
+  }
+
   _setAttrs(target, src, type, selector, ...properties) {
     if(typeof target != 'object' || typeof src != 'object') {
       return;

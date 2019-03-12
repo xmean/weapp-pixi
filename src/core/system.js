@@ -58,6 +58,7 @@ class System {
     const ext = parts.slice(-1);
     
     const resId = base + '@' + r + 'x' + '.' + ext;
+    
     if(resId in PIXI.utils.TextureCache) {
       return resId;
     }

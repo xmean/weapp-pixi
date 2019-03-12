@@ -50,8 +50,9 @@ export default class TextView extends View {
     
     const iconView = 'iconView' + id;
     this[iconView] = new PIXI.Sprite(PIXI.Texture.fromFrame(iconStyle.resId));
-    super._setAttrs(this[iconView], iconStyle, View.ATTR_SIZE, '', 'width', 'height', 'padding');
+    super._setAttrs(this[iconView], iconStyle, View.ATTR_SIZE, '', 'padding');
     super._setAttrs(this[iconView], iconStyle, View.ATTR_VALUE, '', 'tint', 'alpha');
+    super._setImageSize(this[iconView], iconStyle);
 
     this.addChild(this[iconView]);
   }

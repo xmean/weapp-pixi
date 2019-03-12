@@ -33,8 +33,9 @@ export default class ImageView extends View {
       }
     }
 
-    super._setAttrs(this.imageView, this.imageStyle, View.ATTR_SIZE, '', 'width', 'height', 'padding');
+    super._setAttrs(this.imageView, this.imageStyle, View.ATTR_SIZE, '', 'padding');
     super._setAttrs(this.imageView, this.imageStyle, View.ATTR_VALUE, '', 'tint', 'alpha');
+    super._setImageSize(this.imageView, this.imageStyle);
   }
 
   onMeasure() {
