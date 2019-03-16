@@ -146,7 +146,9 @@ export default class ResLoader {
         const img = wx.createImage();
 
         img.src = imagePath;
-        img.onload = () => resolve(new PIXI.BaseTexture(img));
+        img.onload = () => {
+          resolve(new PIXI.BaseTexture(img));
+        }
       });
     }
 
